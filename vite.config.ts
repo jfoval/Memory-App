@@ -45,6 +45,16 @@ export default defineConfig({
     alias: { '@': path.resolve(__dirname, './src') },
   },
   worker: { format: 'es' },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          three: ['three', '@react-three/fiber', '@react-three/drei'],
+          react: ['react', 'react-dom', '@tanstack/react-query', 'zustand'],
+        },
+      },
+    },
+  },
   test: {
     globals: true,
     environment: 'jsdom',
