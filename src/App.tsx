@@ -1,13 +1,26 @@
-import { PALACE } from './palace/palaceData';
+import { useEffect } from 'react';
+import { useAuth } from './auth/authStore';
+import { AuthScreen } from './app/AuthScreen';
+import { AppShell } from './app/AppShell';
+import { repository } from './data/repository';
 
-// Placeholder shell — replaced as features land. Confirms the toolchain builds.
 export default function App() {
-  return (
-    <div className="flex min-h-full flex-col items-center justify-center gap-4 p-8 text-center">
-      <h1 className="text-3xl font-bold">Memory Palace</h1>
-      <p className="text-slate-500">
-        A shared {PALACE.length}-location palace for the Method of Loci.
-      </p>
-    </div>
-  );
+  const { user, loading, init } = useAuth();
+
+  useEffect(() => {
+    void init();
+  }, [init]);
+
+  // Flush any queued offline writes once on load.
+  useEffect(() => {
+    if (user) void repository.flush();
+  }, [user]);
+
+  if (loading) {
+    return (
+      <div className="flex min-h-full items-center justify-center text-slate-400">Loading…</div>
+    );
+  }
+
+  return user ? <AppShell /> : <AuthScreen />;
 }
