@@ -4,7 +4,12 @@ import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 import path from 'node:path';
 
+// Base path is '/' for root deploys (Vercel/Netlify) and set to the repo path
+// for GitHub Pages via the BASE_PATH env var in the deploy workflow.
+const base = process.env.BASE_PATH || '/';
+
 export default defineConfig({
+  base,
   plugins: [
     react(),
     VitePWA({
@@ -45,6 +50,11 @@ export default defineConfig({
     alias: { '@': path.resolve(__dirname, './src') },
   },
   worker: { format: 'es' },
+  preview: {
+    host: true,
+    // Allow tunnel hostnames (e.g. *.trycloudflare.com) to reach the preview.
+    allowedHosts: true,
+  },
   build: {
     rollupOptions: {
       output: {
