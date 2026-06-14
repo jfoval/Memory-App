@@ -2,6 +2,7 @@ import { lazy, Suspense } from 'react';
 import { useNav } from '../../store/navStore';
 import { getLocus } from '../../palace/palaceData';
 import { useAllItems } from '../../data/hooks';
+import { WorldLoader } from '../world/WorldLoader';
 
 // The 3D palace (and its ~1 MB Three.js engine) is loaded only when this screen
 // is opened, so the rest of the app paints instantly — important on mobile data.
@@ -30,6 +31,11 @@ export function ExploreScreen() {
       >
         <PalaceCanvas />
       </Suspense>
+
+      {/* Load a content set or card deck into the world. */}
+      <div className="pointer-events-none absolute inset-x-0 top-2 z-20 mx-auto max-w-md px-3">
+        <WorldLoader />
+      </div>
 
       {locus && (
         <div className="absolute inset-x-0 bottom-16 z-20 mx-auto max-w-lg px-3">

@@ -46,8 +46,8 @@ describe('shared palace', () => {
   });
 
   it('looks up a locus by index', () => {
-    expect(getLocus(1)?.name).toBe('Front Gate');
-    expect(getLocus(52)?.name).toBe('Rooftop Rail');
+    expect(getLocus(1)?.name).toBe('Street Lamp');
+    expect(getLocus(52)?.name).toBe('Solar Array');
     expect(getLocus(99)).toBeUndefined();
   });
 });

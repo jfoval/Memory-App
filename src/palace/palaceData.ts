@@ -15,69 +15,71 @@ interface AuthoredLocus {
   landmark: string;
   shape: LocusShape;
   color: string;
+  model: string; // GLB slug in /public/models
 }
 
-// 13 loci per zone, in walking order.
+// 13 loci per zone, in walking order. Each maps to a real CC0 KayKit model so
+// every stop is a recognisable object you can picture and "place" things on.
 const AUTHORED: AuthoredLocus[] = [
-  // Zone 1 — Garden Court (1-13)
-  { name: 'Front Gate', landmark: 'a tall wrought-iron arch', shape: 'arch', color: '#1e3a8a' },
-  { name: 'Stone Fountain', landmark: 'a bubbling tiered fountain', shape: 'cylinder', color: '#38bdf8' },
-  { name: 'Koi Pond', landmark: 'a round pond ringed with stones', shape: 'torus', color: '#f97316' },
-  { name: 'Topiary Bear', landmark: 'a shrub clipped like a bear', shape: 'sphere', color: '#22c55e' },
-  { name: 'Sundial', landmark: 'a bronze sundial on a pillar', shape: 'cone', color: '#b45309' },
-  { name: 'Garden Bench', landmark: 'a long marble bench', shape: 'cube', color: '#e5e7eb' },
-  { name: 'Rose Arch', landmark: 'an arch heavy with red roses', shape: 'arch', color: '#ef4444' },
-  { name: 'Birdbath', landmark: 'a shallow stone birdbath', shape: 'ring', color: '#94a3b8' },
-  { name: 'Greenhouse', landmark: 'a small glass greenhouse', shape: 'pyramid', color: '#a7f3d0' },
-  { name: 'Garden Gnome', landmark: 'a red-hatted garden gnome', shape: 'cone', color: '#dc2626' },
-  { name: 'Wishing Well', landmark: 'an old stone wishing well', shape: 'cylinder', color: '#78716c' },
-  { name: 'Tulip Bed', landmark: 'a raised bed of tulips', shape: 'cube', color: '#f472b6' },
-  { name: 'Side Door', landmark: 'a wooden door into the house', shape: 'arch', color: '#92400e' },
+  // Zone 1 — Town Square (1-13)
+  { name: 'Street Lamp', landmark: 'a tall iron street lamp', shape: 'cylinder', color: '#1e3a8a', model: 'lamp' },
+  { name: 'Park Bench', landmark: 'a long wooden park bench', shape: 'cube', color: '#38bdf8', model: 'bench' },
+  { name: 'Hedge Bush', landmark: 'a rounded green hedge', shape: 'sphere', color: '#22c55e', model: 'bush' },
+  { name: 'Fire Hydrant', landmark: 'a red fire hydrant', shape: 'cylinder', color: '#ef4444', model: 'hydrant' },
+  { name: 'Water Tower', landmark: 'a tall water tower', shape: 'cylinder', color: '#b45309', model: 'watertower' },
+  { name: 'Dumpster', landmark: 'a big metal dumpster', shape: 'cube', color: '#16a34a', model: 'dumpster' },
+  { name: 'Traffic Light', landmark: 'a set of traffic lights', shape: 'cylinder', color: '#facc15', model: 'trafficlight' },
+  { name: 'Trash Can', landmark: 'a public trash can', shape: 'cylinder', color: '#94a3b8', model: 'trashcan' },
+  { name: 'Wooden Crate', landmark: 'a stack of wooden crates', shape: 'cube', color: '#a16207', model: 'crate' },
+  { name: 'Taxi Cab', landmark: 'a yellow taxi cab', shape: 'cube', color: '#eab308', model: 'taxi' },
+  { name: 'Police Car', landmark: 'a parked police car', shape: 'cube', color: '#1d4ed8', model: 'police' },
+  { name: 'Corner Shop', landmark: 'a small corner shop', shape: 'cube', color: '#0ea5e9', model: 'shop' },
+  { name: 'Clock Tower', landmark: 'a tall clock tower', shape: 'cube', color: '#6366f1', model: 'clocktower' },
 
-  // Zone 2 — Kitchen Wing (14-26)
-  { name: 'Kitchen Sink', landmark: 'a deep ceramic farmhouse sink', shape: 'cube', color: '#e2e8f0' },
-  { name: 'Copper Pot', landmark: 'a hanging copper stockpot', shape: 'cylinder', color: '#ea580c' },
-  { name: 'Stove Flame', landmark: 'a gas range with a blue flame', shape: 'cone', color: '#f59e0b' },
-  { name: 'Spice Rack', landmark: 'a tiered rack of spice jars', shape: 'cube', color: '#b91c1c' },
-  { name: 'Fruit Bowl', landmark: 'a bowl piled with oranges', shape: 'sphere', color: '#fb923c' },
-  { name: 'Rolling Pin', landmark: 'a wooden rolling pin on the counter', shape: 'cylinder', color: '#d4a373' },
-  { name: 'Garlic Braid', landmark: 'a braid of garlic bulbs', shape: 'sphere', color: '#eab308' },
-  { name: 'Butcher Block', landmark: 'a thick butcher’s block', shape: 'cube', color: '#a16207' },
-  { name: 'Brass Kettle', landmark: 'a whistling brass kettle', shape: 'sphere', color: '#fbbf24' },
-  { name: 'Apple Pie', landmark: 'a pie cooling on a rack', shape: 'cylinder', color: '#f87171' },
-  { name: 'Knife Block', landmark: 'a wooden block of knives', shape: 'pyramid', color: '#57534e' },
-  { name: 'Pantry Door', landmark: 'a narrow pantry doorway', shape: 'arch', color: '#7c2d12' },
-  { name: 'Honey Jar', landmark: 'a golden jar of honey', shape: 'cylinder', color: '#facc15' },
+  // Zone 2 — The Kitchen (14-26)
+  { name: 'Range Hood', landmark: 'a steel extractor hood', shape: 'cube', color: '#e2e8f0', model: 'hood' },
+  { name: 'Cutting Board', landmark: 'a wooden cutting board', shape: 'cube', color: '#d4a373', model: 'board' },
+  { name: 'Dish Rack', landmark: 'a rack of clean plates', shape: 'cube', color: '#cbd5e1', model: 'dishrack' },
+  { name: 'Kitchen Chair', landmark: 'a simple kitchen chair', shape: 'cube', color: '#b91c1c', model: 'kchair' },
+  { name: 'Carrot Crate', landmark: 'a crate of carrots', shape: 'cube', color: '#fb923c', model: 'carrots' },
+  { name: 'Tomato Crate', landmark: 'a crate of tomatoes', shape: 'cube', color: '#ef4444', model: 'tomatoes' },
+  { name: 'Cheese Crate', landmark: 'a crate of cheese wheels', shape: 'cube', color: '#eab308', model: 'cheese' },
+  { name: 'Burger Plate', landmark: 'a plated burger', shape: 'cylinder', color: '#a16207', model: 'burger' },
+  { name: 'Pot of Stew', landmark: 'a steaming pot of stew', shape: 'cylinder', color: '#f59e0b', model: 'stew' },
+  { name: 'Soup Bowl', landmark: 'a full soup bowl', shape: 'sphere', color: '#fbbf24', model: 'bowl' },
+  { name: 'Ham Crate', landmark: 'a crate of ham', shape: 'cube', color: '#f87171', model: 'ham' },
+  { name: 'Potato Crate', landmark: 'a crate of potatoes', shape: 'cube', color: '#a8a29e', model: 'potatoes' },
+  { name: 'Onion Crate', landmark: 'a crate of onions', shape: 'cube', color: '#facc15', model: 'onions' },
 
-  // Zone 3 — Library Hall (27-39)
-  { name: 'Reading Lamp', landmark: 'a glowing brass desk lamp', shape: 'cone', color: '#fde047' },
-  { name: 'Antique Globe', landmark: 'a world globe on a stand', shape: 'sphere', color: '#2563eb' },
-  { name: 'Tall Bookcase', landmark: 'floor-to-ceiling shelves', shape: 'cube', color: '#78350f' },
-  { name: 'Leather Chair', landmark: 'a wingback reading chair', shape: 'cube', color: '#7f1d1d' },
-  { name: 'Library Ladder', landmark: 'a rolling library ladder', shape: 'cylinder', color: '#a8a29e' },
-  { name: 'Marble Bust', landmark: 'a poet’s bust on a plinth', shape: 'cone', color: '#f1f5f9' },
-  { name: 'Map Table', landmark: 'a table strewn with maps', shape: 'cube', color: '#ca8a04' },
-  { name: 'Hourglass', landmark: 'a large sand hourglass', shape: 'cylinder', color: '#fcd34d' },
-  { name: 'Chandelier', landmark: 'a crystal chandelier overhead', shape: 'torus', color: '#67e8f9' },
-  { name: 'Fireplace', landmark: 'a stone hearth with embers', shape: 'cube', color: '#f97316' },
-  { name: 'Quill Desk', landmark: 'a writing desk with a quill', shape: 'cube', color: '#92400e' },
-  { name: 'Ship Model', landmark: 'a model galleon in a case', shape: 'pyramid', color: '#d97706' },
-  { name: 'Secret Door', landmark: 'a bookcase that swings open', shape: 'arch', color: '#451a03' },
+  // Zone 3 — The Old Crypt (27-39)
+  { name: 'Long Table', landmark: 'a long wooden table', shape: 'cube', color: '#78350f', model: 'table' },
+  { name: 'Wooden Chair', landmark: 'a sturdy wooden chair', shape: 'cube', color: '#7f1d1d', model: 'cchair' },
+  { name: 'Treasure Chest', landmark: 'a heavy treasure chest', shape: 'cube', color: '#ca8a04', model: 'chest' },
+  { name: 'Wall Torch', landmark: 'a burning wall torch', shape: 'cone', color: '#f97316', model: 'torch' },
+  { name: 'Candelabra', landmark: 'a three-armed candelabra', shape: 'cylinder', color: '#fde047', model: 'candelabra' },
+  { name: 'Large Barrel', landmark: 'a big wooden barrel', shape: 'cylinder', color: '#92400e', model: 'barrel' },
+  { name: 'Green Bottle', landmark: 'a tall green bottle', shape: 'cylinder', color: '#16a34a', model: 'bottle' },
+  { name: 'Large Crate', landmark: 'a large storage crate', shape: 'cube', color: '#a16207', model: 'bigcrate' },
+  { name: 'Stone Pillar', landmark: 'a carved stone pillar', shape: 'cylinder', color: '#a8a29e', model: 'pillar' },
+  { name: 'Red Banner', landmark: 'a hanging red banner', shape: 'cube', color: '#dc2626', model: 'banner' },
+  { name: 'Sword & Shield', landmark: 'a sword resting on a shield', shape: 'cube', color: '#9ca3af', model: 'swordshield' },
+  { name: 'Ring of Keys', landmark: 'a heavy ring of keys', shape: 'ring', color: '#fcd34d', model: 'keys' },
+  { name: 'Old Bed', landmark: 'an old decorated bed', shape: 'cube', color: '#451a03', model: 'bed' },
 
-  // Zone 4 — Observatory Tower (40-52)
-  { name: 'Spiral Stair', landmark: 'an iron spiral staircase', shape: 'cylinder', color: '#64748b' },
-  { name: 'Telescope', landmark: 'a brass telescope on a tripod', shape: 'cone', color: '#b45309' },
-  { name: 'Star Chart', landmark: 'a wall of constellation charts', shape: 'cube', color: '#1e293b' },
-  { name: 'Orrery', landmark: 'a clockwork model of the planets', shape: 'torus', color: '#fbbf24' },
-  { name: 'Glass Dome', landmark: 'a domed glass ceiling', shape: 'sphere', color: '#bae6fd' },
-  { name: 'Compass Rose', landmark: 'a compass inlaid in the floor', shape: 'ring', color: '#c084fc' },
-  { name: 'Weather Vane', landmark: 'a copper rooster vane', shape: 'cone', color: '#d97706' },
-  { name: 'Pendulum', landmark: 'a long swinging pendulum', shape: 'sphere', color: '#e2e8f0' },
-  { name: 'Control Panel', landmark: 'a panel of brass dials', shape: 'cube', color: '#f59e0b' },
-  { name: 'Meteorite', landmark: 'a dark rock on a pedestal', shape: 'sphere', color: '#334155' },
-  { name: 'Moon Globe', landmark: 'a silver model of the moon', shape: 'sphere', color: '#cbd5e1' },
-  { name: 'Beacon Light', landmark: 'a rotating beacon lamp', shape: 'cylinder', color: '#fef08a' },
-  { name: 'Rooftop Rail', landmark: 'a railing at the very top', shape: 'arch', color: '#a78bfa' },
+  // Zone 4 — Space Base (40-52)
+  { name: 'Habitat Module', landmark: 'a domed habitat module', shape: 'sphere', color: '#64748b', model: 'habitat' },
+  { name: 'Cargo Pod', landmark: 'a sealed cargo pod', shape: 'cube', color: '#b45309', model: 'cargo' },
+  { name: 'Cargo Depot', landmark: 'a stacked cargo depot', shape: 'cube', color: '#1e293b', model: 'depot' },
+  { name: 'Container Stack', landmark: 'a stack of containers', shape: 'cube', color: '#fbbf24', model: 'containers' },
+  { name: 'Drill Rig', landmark: 'a mining drill rig', shape: 'cylinder', color: '#bae6fd', model: 'drill' },
+  { name: 'Lander', landmark: 'a four-legged lander', shape: 'cone', color: '#c084fc', model: 'lander' },
+  { name: 'Landing Pad', landmark: 'a marked landing pad', shape: 'cylinder', color: '#d97706', model: 'pad' },
+  { name: 'Solar Panel', landmark: 'a tilted solar panel', shape: 'cube', color: '#e2e8f0', model: 'solar' },
+  { name: 'Space Truck', landmark: 'a rugged space truck', shape: 'cube', color: '#f59e0b', model: 'truck' },
+  { name: 'Wind Turbine', landmark: 'a tall wind turbine', shape: 'cylinder', color: '#334155', model: 'turbine' },
+  { name: 'Moon Rock', landmark: 'a large grey moon rock', shape: 'sphere', color: '#cbd5e1', model: 'moonrock' },
+  { name: 'Tall Spire', landmark: 'a tall metal spire', shape: 'cone', color: '#fef08a', model: 'spire' },
+  { name: 'Solar Array', landmark: 'a roof of solar panels', shape: 'cube', color: '#a78bfa', model: 'array' },
 ];
 
 // Serpentine offsets within a zone's square area (local x/z, metres from the
@@ -114,6 +116,7 @@ function buildPalace(): Locus[] {
       landmark: a.landmark,
       shape: a.shape,
       color: a.color,
+      model: a.model,
       position: { x: origin.x + local.dx, y: 0, z: origin.z + local.dz },
     };
   });

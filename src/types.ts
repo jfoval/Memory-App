@@ -24,8 +24,9 @@ export interface Locus {
   zone: ZoneId;
   name: string; // short, memorable
   landmark: string; // distinctive description driving the visual
-  shape: LocusShape;
-  color: string; // hex, distinct from immediate neighbours
+  shape: LocusShape; // fallback primitive if the model fails to load
+  color: string; // hex, distinct from immediate neighbours (fallback)
+  model: string; // GLB model slug in /public/models/<model>.glb
   position: Vec3; // authored for clear spacing along the route
 }
 

@@ -19,8 +19,8 @@ export interface ZoneMeta {
 export const ZONES: Record<ZoneId, ZoneMeta> = {
   1: {
     id: 1,
-    name: 'Garden Court',
-    theme: 'Open-air entrance: water, stone and greenery',
+    name: 'Town Square',
+    theme: 'An open plaza of lamps, benches and traffic',
     tint: '#3b82f6',
     suit: '♠',
     suitName: 'spades',
@@ -28,8 +28,8 @@ export const ZONES: Record<ZoneId, ZoneMeta> = {
   },
   2: {
     id: 2,
-    name: 'Kitchen Wing',
-    theme: 'Warm domestic interior: copper, tile and flame',
+    name: 'The Kitchen',
+    theme: 'A busy restaurant kitchen of crates and food',
     tint: '#10b981',
     suit: '♥',
     suitName: 'hearts',
@@ -37,8 +37,8 @@ export const ZONES: Record<ZoneId, ZoneMeta> = {
   },
   3: {
     id: 3,
-    name: 'Library Hall',
-    theme: 'Quiet study: wood, brass and lamplight',
+    name: 'The Old Crypt',
+    theme: 'A torch-lit stone vault of barrels and chests',
     tint: '#f59e0b',
     suit: '♦',
     suitName: 'diamonds',
@@ -46,8 +46,8 @@ export const ZONES: Record<ZoneId, ZoneMeta> = {
   },
   4: {
     id: 4,
-    name: 'Observatory Tower',
-    theme: 'High and cold: glass, steel and starlight',
+    name: 'Space Base',
+    theme: 'An off-world outpost of modules and landers',
     tint: '#a855f7',
     suit: '♣',
     suitName: 'clubs',
