@@ -55,16 +55,6 @@ export default defineConfig({
     // Allow tunnel hostnames (e.g. *.trycloudflare.com) to reach the preview.
     allowedHosts: true,
   },
-  build: {
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          three: ['three', '@react-three/fiber', '@react-three/drei'],
-          react: ['react', 'react-dom', '@tanstack/react-query', 'zustand'],
-        },
-      },
-    },
-  },
   test: {
     globals: true,
     environment: 'jsdom',

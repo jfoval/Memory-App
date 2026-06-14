@@ -12,7 +12,12 @@
     <title>Memory Palace</title>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <!-- Shown immediately, before the app's JavaScript loads. React replaces it. -->
+      <div style="height: 100%; display: flex; align-items: center; justify-content: center; color: #64748b; font-family: system-ui, sans-serif;">
+        Loading Memory Palace…
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

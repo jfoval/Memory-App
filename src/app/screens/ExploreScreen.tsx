@@ -1,7 +1,13 @@
-import { PalaceCanvas } from '../../scene/PalaceCanvas';
+import { lazy, Suspense } from 'react';
 import { useNav } from '../../store/navStore';
 import { getLocus } from '../../palace/palaceData';
 import { useAllItems } from '../../data/hooks';
+
+// The 3D palace (and its ~1 MB Three.js engine) is loaded only when this screen
+// is opened, so the rest of the app paints instantly — important on mobile data.
+const PalaceCanvas = lazy(() =>
+  import('../../scene/PalaceCanvas').then((m) => ({ default: m.PalaceCanvas })),
+);
 
 // The immersive palace view plus a detail sheet for the tapped locus, showing
 // any content the user has placed there across their sets.
@@ -15,7 +21,15 @@ export function ExploreScreen() {
 
   return (
     <div className="relative h-full w-full">
-      <PalaceCanvas />
+      <Suspense
+        fallback={
+          <div className="flex h-full items-center justify-center text-slate-400">
+            Loading the palace…
+          </div>
+        }
+      >
+        <PalaceCanvas />
+      </Suspense>
 
       {locus && (
         <div className="absolute inset-x-0 bottom-16 z-20 mx-auto max-w-lg px-3">
