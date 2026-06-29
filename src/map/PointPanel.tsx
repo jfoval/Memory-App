@@ -1,5 +1,4 @@
 import { useRoutes } from '../store/routesStore';
-import { streetViewLink } from './streetview';
 
 // Bottom sheet to edit the selected pin: the place name, what to remember there,
 // a vivid association, plus a free "Street View" link and reorder/delete.
@@ -10,6 +9,7 @@ export function PointPanel() {
   const remove = useRoutes((s) => s.remove);
   const move = useRoutes((s) => s.move);
   const select = useRoutes((s) => s.select);
+  const setEntry = useRoutes((s) => s.setEntry);
 
   const point = route?.points.find((p) => p.id === selectedId);
   if (!point) return null;
@@ -26,14 +26,14 @@ export function PointPanel() {
             <button className="btn-ghost px-2 py-1 text-xs" onClick={() => move(point.id, 1)}>
               ↓
             </button>
-            <a
+            <button
               className="btn-ghost px-2 py-1 text-xs"
-              href={streetViewLink(point.lat, point.lng)}
-              target="_blank"
-              rel="noreferrer"
+              onClick={() =>
+                setEntry({ lat: point.lat, lng: point.lng, imageId: point.imageId })
+              }
             >
-              Street View ↗
-            </a>
+              Street View
+            </button>
             <button className="btn-ghost px-2 py-1 text-xs" onClick={() => select(null)}>
               Close
             </button>

@@ -1,20 +1,19 @@
 import { useRoutes } from '../store/routesStore';
-import { streetViewLink, streetViewEmbed } from './streetview';
 
-// During a walk, the map flies stop-to-stop. This panel shows the current stop's
-// content (with hide/reveal for self-testing) and a Street View of the spot —
-// embedded if a Google key is set, otherwise a one-tap link.
+// During a map walk, the map flies stop-to-stop. This panel shows the current
+// stop's content (hide/reveal for self-testing) and a button to walk this spot
+// in the in-app Mapillary Street View.
 export function WalkPanel() {
   const route = useRoutes((s) => s.route);
   const walkIndex = useRoutes((s) => s.walkIndex);
   const walkTo = useRoutes((s) => s.walkTo);
   const revealed = useRoutes((s) => s.revealed);
   const setRevealed = useRoutes((s) => s.setRevealed);
+  const setEntry = useRoutes((s) => s.setEntry);
 
   if (!route || route.points.length === 0) return null;
   const point = route.points[walkIndex];
   if (!point) return null;
-  const embed = streetViewEmbed(point.lat, point.lng);
 
   return (
     <div className="absolute inset-x-0 bottom-3 z-30 mx-auto max-w-lg px-3">
@@ -28,24 +27,12 @@ export function WalkPanel() {
           </span>
         </div>
 
-        {embed ? (
-          <iframe
-            title="Street View"
-            className="h-40 w-full rounded-lg border-0"
-            loading="lazy"
-            allowFullScreen
-            src={embed}
-          />
-        ) : (
-          <a
-            className="btn-ghost w-full text-sm"
-            href={streetViewLink(point.lat, point.lng)}
-            target="_blank"
-            rel="noreferrer"
-          >
-            👁 Open Street View of this spot ↗
-          </a>
-        )}
+        <button
+          className="btn-ghost w-full text-sm"
+          onClick={() => setEntry({ lat: point.lat, lng: point.lng, imageId: point.imageId })}
+        >
+          🚶 Walk this spot in Street View
+        </button>
 
         <div className="min-h-[60px] rounded-lg bg-slate-100 p-3 text-sm dark:bg-slate-800">
           {revealed ? (

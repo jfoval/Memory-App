@@ -2,11 +2,12 @@ import { useEffect, useRef, useState } from 'react';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { OPENFREEMAP_STYLE } from './mapStyle';
+import { mapillaryCoverageTiles } from './streetview';
 import { useRoutes } from '../store/routesStore';
 
-// The interactive map. In edit mode, clicking drops a numbered pin; in walk mode
-// it flies to the current stop. Markers + the connecting line are managed
-// imperatively (MapLibre is an imperative library).
+// The map is the "find your start" step. Mapillary coverage is painted on it in
+// green, and tapping a green point drops you into that exact panorama — no flaky
+// "nearby" lookup. Existing stops show as numbered pins.
 export function RouteMap() {
   const container = useRef<HTMLDivElement>(null);
   const map = useRef<maplibregl.Map | null>(null);
@@ -14,24 +15,24 @@ export function RouteMap() {
   const [ready, setReady] = useState(false);
   const [search, setSearch] = useState('');
   const [results, setResults] = useState<{ name: string; lat: number; lon: number }[]>([]);
+  const [hint, setHint] = useState('Green = Street View coverage. Zoom in and tap a green dot to walk it.');
 
   const route = useRoutes((s) => s.route);
   const selectedId = useRoutes((s) => s.selectedId);
   const mode = useRoutes((s) => s.mode);
   const walkIndex = useRoutes((s) => s.walkIndex);
 
-  // Init once.
   useEffect(() => {
     if (!container.current || map.current) return;
     const m = new maplibregl.Map({
       container: container.current,
       style: OPENFREEMAP_STYLE,
-      center: [-91.187, 30.4515], // Baton Rouge-ish default; user searches from here
-      zoom: 13,
+      center: [-91.187, 30.4515],
+      zoom: 14,
     });
     m.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'bottom-right');
-    // Add the route line once the style is ready (and re-add if the style reloads).
-    const ensureLine = () => {
+
+    const ensureLayers = () => {
       if (!m.isStyleLoaded()) return;
       if (!m.getSource('route-line')) {
         m.addSource('route-line', {
@@ -45,19 +46,73 @@ export function RouteMap() {
           paint: { 'line-color': '#3b82f6', 'line-width': 4, 'line-opacity': 0.85 },
         });
       }
+      // Mapillary coverage overlay (green) so it's obvious what you can pick.
+      const cov = mapillaryCoverageTiles();
+      if (cov && !m.getSource('mly')) {
+        m.addSource('mly', { type: 'vector', tiles: [cov], minzoom: 6, maxzoom: 14 });
+        m.addLayer({
+          id: 'mly-seq',
+          type: 'line',
+          source: 'mly',
+          'source-layer': 'sequence',
+          paint: { 'line-color': '#22c55e', 'line-width': 3, 'line-opacity': 0.7 },
+        });
+        m.addLayer({
+          id: 'mly-image',
+          type: 'circle',
+          source: 'mly',
+          'source-layer': 'image',
+          minzoom: 14,
+          paint: {
+            'circle-color': '#16a34a',
+            'circle-radius': 4,
+            'circle-stroke-color': '#ffffff',
+            'circle-stroke-width': 1,
+          },
+        });
+      }
       setReady(true);
     };
     m.on('load', () => {
-      ensureLine();
+      ensureLayers();
       m.resize();
     });
-    m.on('styledata', ensureLine);
-    // Belt-and-suspenders: ensure the canvas matches the container once laid out.
+    m.on('styledata', ensureLayers);
     setTimeout(() => m.resize(), 250);
+
+    // Tap a green coverage point -> enter Street View at that exact image.
     m.on('click', (e) => {
-      if (useRoutes.getState().mode !== 'edit') return;
-      useRoutes.getState().addAt(e.lngLat.lat, e.lngLat.lng);
+      const box: [maplibregl.PointLike, maplibregl.PointLike] = [
+        [e.point.x - 10, e.point.y - 10],
+        [e.point.x + 10, e.point.y + 10],
+      ];
+      let imgs: maplibregl.MapGeoJSONFeature[] = [];
+      try {
+        imgs = m.queryRenderedFeatures(box, { layers: ['mly-image'] });
+      } catch {
+        /* layer not ready */
+      }
+      if (imgs.length) {
+        const f = imgs[0];
+        const [lng, lat] = (f.geometry as GeoJSON.Point).coordinates;
+        useRoutes.getState().setEntry({ lat, lng, imageId: String(f.properties.id) });
+        return;
+      }
+      // Tapped a covered street but no dot yet — zoom in so points appear.
+      let lines: maplibregl.MapGeoJSONFeature[] = [];
+      try {
+        lines = m.queryRenderedFeatures(box, { layers: ['mly-seq'] });
+      } catch {
+        /* ignore */
+      }
+      if (lines.length) {
+        m.easeTo({ center: e.lngLat, zoom: Math.max(m.getZoom(), 17) });
+        setHint('Now tap one of the green dots to drop into Street View.');
+      } else {
+        setHint('No Street View coverage there. Pan to a green street and tap a green dot.');
+      }
     });
+
     map.current = m;
     return () => {
       m.remove();
@@ -65,7 +120,7 @@ export function RouteMap() {
     };
   }, []);
 
-  // Sync markers + line whenever points/selection change.
+  // Numbered pins for saved stops + the connecting line.
   useEffect(() => {
     const m = map.current;
     if (!m || !ready || !route) return;
@@ -73,7 +128,6 @@ export function RouteMap() {
     markers.current = route.points.map((p) => {
       const el = document.createElement('div');
       const selected = p.id === selectedId;
-      el.className = 'mp-pin';
       el.textContent = String(p.order);
       el.style.cssText = `width:28px;height:28px;border-radius:9999px;display:flex;align-items:center;justify-content:center;
         font:600 13px system-ui;color:#fff;cursor:pointer;border:2px solid #fff;
@@ -84,9 +138,7 @@ export function RouteMap() {
         st.select(p.id);
         if (st.mode === 'walk') st.walkTo(p.order - 1);
       };
-      return new maplibregl.Marker({ element: el })
-        .setLngLat([p.lng, p.lat])
-        .addTo(m);
+      return new maplibregl.Marker({ element: el }).setLngLat([p.lng, p.lat]).addTo(m);
     });
     const src = m.getSource('route-line') as maplibregl.GeoJSONSource | undefined;
     src?.setData({
@@ -127,11 +179,8 @@ export function RouteMap() {
 
   return (
     <div className="relative h-full w-full">
-      {/* Explicit h-full: MapLibre forces position:relative on this element, which
-          would cancel `absolute inset-0` and collapse it to zero height. */}
       <div ref={container} className="palace-canvas h-full w-full" />
 
-      {/* Search + locate (only useful while editing). */}
       {mode === 'edit' && (
         <div className="pointer-events-none absolute inset-x-0 top-2 z-20 mx-auto max-w-md px-3">
           <form onSubmit={runSearch} className="pointer-events-auto flex gap-2">
@@ -165,24 +214,9 @@ export function RouteMap() {
               ))}
             </div>
           )}
-          <p className="pointer-events-none mt-1 text-center text-xs text-white/80 drop-shadow">
-            Tap to drop a stop, or center on your start and enter Street View
+          <p className="pointer-events-none mt-1 rounded bg-black/40 px-2 py-1 text-center text-xs text-white">
+            {hint}
           </p>
-        </div>
-      )}
-
-      {/* Drop into Street View at the current map centre. */}
-      {mode === 'edit' && (
-        <div className="pointer-events-none absolute inset-x-0 bottom-4 z-20 flex justify-center">
-          <button
-            className="btn-primary pointer-events-auto shadow-lg"
-            onClick={() => {
-              const c = map.current?.getCenter();
-              if (c) useRoutes.getState().setEntry({ lat: c.lat, lng: c.lng });
-            }}
-          >
-            🚶 Enter Street View here
-          </button>
         </div>
       )}
     </div>

@@ -12,6 +12,15 @@ export const hasMapillary = !!mapillaryToken;
 export const hasGoogleStreetView = !!googleKey;
 export const getMapillaryToken = () => mapillaryToken;
 
+// Mapillary coverage vector tiles — paint these on the map so the user can see
+// exactly which streets have imagery (and tap one to jump in).
+export function mapillaryCoverageTiles(): string | null {
+  if (!mapillaryToken) return null;
+  return `https://tiles.mapillary.com/maps/vtp/mly1_public/2/{z}/{x}/{y}?access_token=${encodeURIComponent(
+    mapillaryToken,
+  )}`;
+}
+
 // Free, universal: opens Google Street View at this spot in a new tab.
 export function streetViewLink(lat: number, lng: number): string {
   return `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${lat},${lng}`;

@@ -15,7 +15,7 @@ interface RoutesState {
   selectedId: string | null;
   mode: 'edit' | 'walk';
   view: 'map' | 'street';
-  entry: { lat: number; lng: number } | null; // where to enter Street View
+  entry: { lat: number; lng: number; imageId?: string } | null; // where to enter Street View
   walkIndex: number; // index into points during a walk
   revealed: boolean;
 
@@ -31,7 +31,7 @@ interface RoutesState {
 
   setMode: (mode: 'edit' | 'walk') => void;
   setView: (view: 'map' | 'street') => void;
-  setEntry: (entry: { lat: number; lng: number }) => void;
+  setEntry: (entry: { lat: number; lng: number; imageId?: string }) => void;
   walkTo: (index: number) => void;
   setRevealed: (v: boolean) => void;
 }

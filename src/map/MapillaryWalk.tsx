@@ -32,6 +32,7 @@ export function MapillaryWalk() {
     (async () => {
       const selected = route.points.find((p) => p.id === useRoutes.getState().selectedId);
       const startId =
+        entry?.imageId || // tapped a coverage point on the map (most reliable)
         selected?.imageId ||
         route.points.find((p) => p.imageId)?.imageId ||
         (entry ? await nearestMapillaryImage(entry.lat, entry.lng) : null);
