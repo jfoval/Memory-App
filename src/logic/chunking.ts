@@ -1,9 +1,7 @@
 // Deterministic chunking of pasted text into up to 52 items. No LLM — the user
 // keeps full control and edits the result. Pure functions only.
 
-import { LOCI_COUNT } from '../palace/palaceData';
-
-export const MAX_ITEMS = LOCI_COUNT; // 52
+export const MAX_ITEMS = 52; // cap per route/import
 
 export interface ChunkResult {
   items: string[];

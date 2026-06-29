@@ -23,7 +23,7 @@ export function AuthScreen() {
         <div className="mb-6 text-center">
           <h1 className="text-2xl font-bold">Memory Palace</h1>
           <p className="mt-1 text-sm text-slate-500">
-            Learn one shared 52-location palace by heart.
+            Build memory routes on real maps you know.
           </p>
         </div>
 
@@ -75,8 +75,7 @@ export function AuthScreen() {
 
         {mode === 'local' && (
           <p className="mt-4 text-center text-xs text-slate-400">
-            Running in local mode (no Supabase keys configured). Your data is stored privately on
-            this device.
+            Running in local mode (no Supabase keys). Your data is stored privately on this device.
           </p>
         )}
       </div>

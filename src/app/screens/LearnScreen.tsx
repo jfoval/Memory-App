@@ -1,36 +1,32 @@
 import { useEffect, useState } from 'react';
 import { enableEmbeddings, isEmbeddingEnabled } from '../../embeddings/embeddingService';
-import { ROOMS } from '../../palace/rooms';
-import { useNav } from '../../store/navStore';
 
 const STEPS = [
   {
-    title: 'Make it vivid and absurd',
-    body: 'Ordinary images fade. Picture things that are huge, bizarre, on fire, or impossibly out of place. The stranger the image, the stickier the memory.',
+    title: 'Use a route you already know',
+    body: 'Pick a walk, a commute, or your own home — a path you can already picture with your eyes closed. Familiarity with the place is what makes the memories stick.',
   },
   {
-    title: 'Use all your senses',
-    body: 'Hear the sizzle, smell the smoke, feel the cold. Multi-sensory images are recalled far more reliably than a flat picture.',
+    title: 'Make each image vivid and absurd',
+    body: 'At each stop, picture what you want to remember as something huge, bizarre, on fire, or impossibly out of place. The stranger the image, the stickier.',
   },
   {
-    title: 'Add motion and interaction',
-    body: 'Let your images move and collide with the location. A pie exploding on the kitchen counter beats a pie sitting quietly.',
+    title: 'Use all your senses and motion',
+    body: 'Hear it, smell it, feel it, let it move and collide with the spot. Multi-sensory, moving images are recalled far more reliably than a flat picture.',
   },
   {
     title: 'Generate your own associations',
-    body: 'The app never invents images for you — and that is the point. The effort of creating your own link is exactly what cements it.',
+    body: 'The app never invents the images for you — that is the point. The effort of creating your own link is exactly what cements it.',
   },
   {
-    title: 'Walk the same route every time',
-    body: 'Always travel locations 1 → 52 in order. The fixed route is the thread your memories hang on.',
+    title: 'Always walk the route in the same order',
+    body: 'Travel your stops 1 → N in the same direction every time. The fixed path is the thread your memories hang on.',
   },
 ];
 
 export function LearnScreen() {
   const [embedOn, setEmbedOn] = useState(isEmbeddingEnabled());
   const [dark, setDark] = useState(() => document.documentElement.classList.contains('dark'));
-  const reducedMotion = useNav((s) => s.reducedMotion);
-  const setReducedMotion = useNav((s) => s.setReducedMotion);
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', dark);
@@ -42,24 +38,10 @@ export function LearnScreen() {
       <div className="mx-auto max-w-2xl space-y-4">
         <h2 className="text-xl font-bold">The Method of Loci</h2>
         <p className="text-sm text-slate-500">
-          Place what you want to remember at fixed locations along a familiar route, then walk the
-          route to recall it. You share one carefully designed 52-location palace with everyone —
-          learn it once, deeply, and reuse it forever.
+          Place what you want to remember at fixed spots along a route you know, then walk the route
+          in your mind to recall it. Build your routes on the map in the Routes tab — use real paths
+          you have actually walked, so you already know every sight along the way.
         </p>
-
-        <div className="card">
-          <h3 className="mb-2 font-semibold">The eight rooms</h3>
-          <div className="grid grid-cols-2 gap-2 text-sm">
-            {ROOMS.map((r) => (
-              <div key={r.id} className="flex items-center gap-2">
-                <span className="h-3 w-3 rounded-full" style={{ backgroundColor: r.accent }} />
-                <span>
-                  <strong>{r.name}</strong> — {r.theme}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
 
         <div className="space-y-2">
           {STEPS.map((s, i) => (
@@ -74,7 +56,6 @@ export function LearnScreen() {
 
         <div className="card space-y-3">
           <h3 className="font-semibold">Settings</h3>
-
           <label className="flex items-center justify-between text-sm">
             <span>
               Smart (semantic) scoring
@@ -93,19 +74,9 @@ export function LearnScreen() {
               {embedOn ? 'Enabled' : 'Enable'}
             </button>
           </label>
-
           <label className="flex items-center justify-between text-sm">
             <span>Dark mode</span>
             <input type="checkbox" checked={dark} onChange={(e) => setDark(e.target.checked)} />
-          </label>
-
-          <label className="flex items-center justify-between text-sm">
-            <span>Reduced motion (instant camera moves)</span>
-            <input
-              type="checkbox"
-              checked={reducedMotion}
-              onChange={(e) => setReducedMotion(e.target.checked)}
-            />
           </label>
         </div>
       </div>
