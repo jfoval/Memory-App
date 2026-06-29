@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
-import { OSM_STYLE } from './mapStyle';
+import { OPENFREEMAP_STYLE } from './mapStyle';
 import { useRoutes } from '../store/routesStore';
 
 // The interactive map. In edit mode, clicking drops a numbered pin; in walk mode
@@ -25,24 +25,35 @@ export function RouteMap() {
     if (!container.current || map.current) return;
     const m = new maplibregl.Map({
       container: container.current,
-      style: OSM_STYLE,
-      center: [-0.1276, 51.5072], // London as a neutral default
-      zoom: 14,
+      style: OPENFREEMAP_STYLE,
+      center: [-91.187, 30.4515], // Baton Rouge-ish default; user searches from here
+      zoom: 13,
     });
     m.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'bottom-right');
-    m.on('load', () => {
-      m.addSource('route-line', {
-        type: 'geojson',
-        data: { type: 'Feature', geometry: { type: 'LineString', coordinates: [] }, properties: {} },
-      });
-      m.addLayer({
-        id: 'route-line',
-        type: 'line',
-        source: 'route-line',
-        paint: { 'line-color': '#3b82f6', 'line-width': 4, 'line-opacity': 0.8 },
-      });
+    // Add the route line once the style is ready (and re-add if the style reloads).
+    const ensureLine = () => {
+      if (!m.isStyleLoaded()) return;
+      if (!m.getSource('route-line')) {
+        m.addSource('route-line', {
+          type: 'geojson',
+          data: { type: 'Feature', geometry: { type: 'LineString', coordinates: [] }, properties: {} },
+        });
+        m.addLayer({
+          id: 'route-line',
+          type: 'line',
+          source: 'route-line',
+          paint: { 'line-color': '#3b82f6', 'line-width': 4, 'line-opacity': 0.85 },
+        });
+      }
       setReady(true);
+    };
+    m.on('load', () => {
+      ensureLine();
+      m.resize();
     });
+    m.on('styledata', ensureLine);
+    // Belt-and-suspenders: ensure the canvas matches the container once laid out.
+    setTimeout(() => m.resize(), 250);
     m.on('click', (e) => {
       if (useRoutes.getState().mode !== 'edit') return;
       useRoutes.getState().addAt(e.lngLat.lat, e.lngLat.lng);

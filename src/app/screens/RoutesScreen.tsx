@@ -23,38 +23,32 @@ export function RoutesScreen() {
   // --- Active route: map editor / walk ---
   if (route) {
     return (
-      <div className="relative h-full w-full">
-        <Suspense
-          fallback={<div className="flex h-full items-center justify-center text-slate-400">Loading map…</div>}
-        >
-          <RouteMap />
-        </Suspense>
-
-        {/* Top bar. */}
-        <div className="pointer-events-none absolute inset-x-0 top-0 z-30 flex items-center gap-2 p-2">
+      <div className="flex h-full w-full flex-col">
+        {/* Header row (its own band, so nothing overlaps the map). */}
+        <div className="flex shrink-0 items-center gap-2 border-b border-slate-200 bg-white px-2 py-2 dark:border-slate-800 dark:bg-slate-900">
           <button
-            className="btn-ghost pointer-events-auto px-2 py-1 text-xs"
+            className="btn-ghost shrink-0 px-2 py-1 text-xs"
             onClick={() => {
               close();
               refresh();
             }}
           >
-            ‹ Routes
+            ‹
           </button>
           <input
-            className="input pointer-events-auto flex-1 py-1 text-sm"
+            className="input min-w-0 flex-1 py-1 text-sm"
             value={route.name}
             onChange={(e) => rename(e.target.value)}
           />
-          <div className="pointer-events-auto flex overflow-hidden rounded-lg border border-white/20 text-xs">
+          <div className="flex shrink-0 overflow-hidden rounded-lg border border-slate-300 text-xs dark:border-slate-700">
             <button
-              className={`px-3 py-2 ${mode === 'edit' ? 'bg-blue-600 text-white' : 'bg-black/50 text-white/80'}`}
+              className={`px-3 py-1.5 ${mode === 'edit' ? 'bg-blue-600 text-white' : 'bg-transparent'}`}
               onClick={() => setMode('edit')}
             >
               Edit
             </button>
             <button
-              className={`px-3 py-2 ${mode === 'walk' ? 'bg-blue-600 text-white' : 'bg-black/50 text-white/80'}`}
+              className={`px-3 py-1.5 ${mode === 'walk' ? 'bg-blue-600 text-white' : 'bg-transparent'}`}
               onClick={() => setMode('walk')}
               disabled={route.points.length === 0}
             >
@@ -63,7 +57,17 @@ export function RoutesScreen() {
           </div>
         </div>
 
-        {mode === 'edit' ? <PointPanel /> : <WalkPanel />}
+        {/* Map fills the rest; panels overlay only the map area. */}
+        <div className="relative min-h-0 flex-1">
+          <Suspense
+            fallback={
+              <div className="flex h-full items-center justify-center text-slate-400">Loading map…</div>
+            }
+          >
+            <RouteMap />
+          </Suspense>
+          {mode === 'edit' ? <PointPanel /> : <WalkPanel />}
+        </div>
       </div>
     );
   }

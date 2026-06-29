@@ -1,8 +1,10 @@
 import type { StyleSpecification } from 'maplibre-gl';
 
-// A free MapLibre style backed by OpenStreetMap raster tiles — no API key, no
-// account. (For heavy production traffic you'd swap in a proper tile provider or
-// a Google key; this is the zero-cost default.)
+// Free, no-key, full-street-detail vector tiles from OpenFreeMap — purpose-built
+// as a free Google-Maps alternative for web apps. This is the default style.
+export const OPENFREEMAP_STYLE = 'https://tiles.openfreemap.org/styles/liberty';
+
+// Fallback: OpenStreetMap raster tiles (also no key). Kept as a backup style.
 export const OSM_STYLE: StyleSpecification = {
   version: 8,
   sources: {
