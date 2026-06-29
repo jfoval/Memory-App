@@ -10,6 +10,7 @@ export interface RoutePoint {
   order: number; // 1-based position along the walk
   lat: number;
   lng: number;
+  imageId?: string; // street-level image this stop was dropped at (Mapillary)
   label: string; // the place ("the oak tree", "Joe's Diner")
   content: string; // what to remember here
   association: string; // the user's vivid link (optional)
@@ -80,12 +81,13 @@ export function renumber(points: RoutePoint[]): RoutePoint[] {
   return points.map((p, i) => ({ ...p, order: i + 1 }));
 }
 
-export function addPoint(route: Route, lat: number, lng: number): Route {
+export function addPoint(route: Route, lat: number, lng: number, imageId?: string): Route {
   const point: RoutePoint = {
     id: uuid(),
     order: route.points.length + 1,
     lat,
     lng,
+    imageId,
     label: `Stop ${route.points.length + 1}`,
     content: '',
     association: '',

@@ -14,6 +14,8 @@ interface RoutesState {
   route: Route | null;
   selectedId: string | null;
   mode: 'edit' | 'walk';
+  view: 'map' | 'street';
+  entry: { lat: number; lng: number } | null; // where to enter Street View
   walkIndex: number; // index into points during a walk
   revealed: boolean;
 
@@ -21,12 +23,15 @@ interface RoutesState {
   close: () => void;
   select: (id: string | null) => void;
   addAt: (lat: number, lng: number) => void;
+  addStreetStop: (lat: number, lng: number, imageId: string) => void;
   update: (id: string, patch: Partial<RoutePoint>) => void;
   remove: (id: string) => void;
   move: (id: string, dir: -1 | 1) => void;
   rename: (name: string) => void;
 
   setMode: (mode: 'edit' | 'walk') => void;
+  setView: (view: 'map' | 'street') => void;
+  setEntry: (entry: { lat: number; lng: number }) => void;
   walkTo: (index: number) => void;
   setRevealed: (v: boolean) => void;
 }
@@ -40,10 +45,13 @@ export const useRoutes = create<RoutesState>((set, get) => ({
   route: null,
   selectedId: null,
   mode: 'edit',
+  view: 'map',
+  entry: null,
   walkIndex: 0,
   revealed: true,
 
-  open: (route, mode = 'edit') => set({ route, mode, selectedId: null, walkIndex: 0, revealed: mode === 'edit' }),
+  open: (route, mode = 'edit') =>
+    set({ route, mode, view: 'map', entry: null, selectedId: null, walkIndex: 0, revealed: mode === 'edit' }),
   close: () => set({ route: null, selectedId: null }),
   select: (selectedId) => set({ selectedId }),
 
@@ -51,6 +59,12 @@ export const useRoutes = create<RoutesState>((set, get) => ({
     const r = get().route;
     if (!r) return;
     const next = persist(addPoint(r, lat, lng));
+    set({ route: next, selectedId: next.points[next.points.length - 1].id });
+  },
+  addStreetStop: (lat, lng, imageId) => {
+    const r = get().route;
+    if (!r) return;
+    const next = persist(addPoint(r, lat, lng, imageId));
     set({ route: next, selectedId: next.points[next.points.length - 1].id });
   },
   update: (id, patch) => {
@@ -75,6 +89,8 @@ export const useRoutes = create<RoutesState>((set, get) => ({
   },
 
   setMode: (mode) => set({ mode, revealed: mode === 'edit' }),
+  setView: (view) => set({ view }),
+  setEntry: (entry) => set({ entry, view: 'street' }),
   walkTo: (walkIndex) => set({ walkIndex, revealed: false }),
   setRevealed: (revealed) => set({ revealed }),
 }));

@@ -166,8 +166,23 @@ export function RouteMap() {
             </div>
           )}
           <p className="pointer-events-none mt-1 text-center text-xs text-white/80 drop-shadow">
-            Tap the map to drop your next stop
+            Tap to drop a stop, or center on your start and enter Street View
           </p>
+        </div>
+      )}
+
+      {/* Drop into Street View at the current map centre. */}
+      {mode === 'edit' && (
+        <div className="pointer-events-none absolute inset-x-0 bottom-4 z-20 flex justify-center">
+          <button
+            className="btn-primary pointer-events-auto shadow-lg"
+            onClick={() => {
+              const c = map.current?.getCenter();
+              if (c) useRoutes.getState().setEntry({ lat: c.lat, lng: c.lng });
+            }}
+          >
+            🚶 Enter Street View here
+          </button>
         </div>
       )}
     </div>

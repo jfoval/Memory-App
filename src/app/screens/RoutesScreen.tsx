@@ -5,12 +5,15 @@ import { createRoute, deleteRoute, listRoutes, type Route } from '../../data/rou
 import { PointPanel } from '../../map/PointPanel';
 import { WalkPanel } from '../../map/WalkPanel';
 
-// The map (and MapLibre) loads only when a route is opened.
+// Heavy map/street libraries load only when a route is opened.
 const RouteMap = lazy(() => import('../../map/RouteMap').then((m) => ({ default: m.RouteMap })));
+const MapillaryWalk = lazy(() =>
+  import('../../map/MapillaryWalk').then((m) => ({ default: m.MapillaryWalk })),
+);
 
 export function RoutesScreen() {
   const uid = useAuth((s) => s.user?.id);
-  const { route, mode, open, close, setMode, rename } = useRoutes();
+  const { route, mode, view, open, close, setMode, setView, rename } = useRoutes();
   const [routes, setRoutesList] = useState<Route[]>([]);
   const [name, setName] = useState('');
 
@@ -42,13 +45,27 @@ export function RoutesScreen() {
           />
           <div className="flex shrink-0 overflow-hidden rounded-lg border border-slate-300 text-xs dark:border-slate-700">
             <button
-              className={`px-3 py-1.5 ${mode === 'edit' ? 'bg-blue-600 text-white' : 'bg-transparent'}`}
+              className={`px-2.5 py-1.5 ${view === 'map' ? 'bg-slate-700 text-white' : 'bg-transparent'}`}
+              onClick={() => setView('map')}
+            >
+              Map
+            </button>
+            <button
+              className={`px-2.5 py-1.5 ${view === 'street' ? 'bg-slate-700 text-white' : 'bg-transparent'}`}
+              onClick={() => setView('street')}
+            >
+              Street
+            </button>
+          </div>
+          <div className="flex shrink-0 overflow-hidden rounded-lg border border-slate-300 text-xs dark:border-slate-700">
+            <button
+              className={`px-2.5 py-1.5 ${mode === 'edit' ? 'bg-blue-600 text-white' : 'bg-transparent'}`}
               onClick={() => setMode('edit')}
             >
               Edit
             </button>
             <button
-              className={`px-3 py-1.5 ${mode === 'walk' ? 'bg-blue-600 text-white' : 'bg-transparent'}`}
+              className={`px-2.5 py-1.5 ${mode === 'walk' ? 'bg-blue-600 text-white' : 'bg-transparent'}`}
               onClick={() => setMode('walk')}
               disabled={route.points.length === 0}
             >
@@ -57,16 +74,18 @@ export function RoutesScreen() {
           </div>
         </div>
 
-        {/* Map fills the rest; panels overlay only the map area. */}
+        {/* Map or Street View fills the rest; panels overlay only this area. */}
         <div className="relative min-h-0 flex-1">
           <Suspense
             fallback={
-              <div className="flex h-full items-center justify-center text-slate-400">Loading map…</div>
+              <div className="flex h-full items-center justify-center text-slate-400">Loading…</div>
             }
           >
-            <RouteMap />
+            {view === 'map' ? <RouteMap /> : <MapillaryWalk />}
           </Suspense>
-          {mode === 'edit' ? <PointPanel /> : <WalkPanel />}
+          {/* Edit content in a panel; map-walk uses WalkPanel; street-walk has its own overlay. */}
+          {mode === 'edit' && <PointPanel />}
+          {mode === 'walk' && view === 'map' && <WalkPanel />}
         </div>
       </div>
     );

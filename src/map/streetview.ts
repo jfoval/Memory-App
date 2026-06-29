@@ -1,25 +1,42 @@
-// Street-level imagery provider abstraction. Today it always offers a free
-// "open in Google Street View" link (no key, no cost). When a Google Maps key is
-// configured (VITE_GOOGLE_MAPS_KEY) it also exposes an embeddable Street View URL
-// so the view can live inside the app. Swapping is just adding the env var.
+// Street-level provider abstraction. Two real providers can do the full
+// experience (walk panorama-to-panorama + place markers in the view):
+//   - Mapillary  — free, no per-load cost at any scale (crowd-sourced coverage)
+//   - Google     — best/universal coverage, but billed per panorama at scale
+// Plus a universal free "open in Google Street View" link as a fallback.
+// Switching providers is just setting the matching env var.
 
+const mapillaryToken = import.meta.env.VITE_MAPILLARY_TOKEN;
 const googleKey = import.meta.env.VITE_GOOGLE_MAPS_KEY;
 
+export const hasMapillary = !!mapillaryToken;
 export const hasGoogleStreetView = !!googleKey;
+export const getMapillaryToken = () => mapillaryToken;
 
 // Free, universal: opens Google Street View at this spot in a new tab.
 export function streetViewLink(lat: number, lng: number): string {
   return `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${lat},${lng}`;
 }
 
-// A plain Google Maps link to the spot (always free, for context).
-export function mapLink(lat: number, lng: number): string {
-  return `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
-}
-
-// Embeddable Street View iframe URL — only when a key is configured. The Maps
-// Embed API is free and unlimited; the key just needs billing enabled.
+// Embeddable Google Street View (only when a key is configured).
 export function streetViewEmbed(lat: number, lng: number): string | null {
   if (!googleKey) return null;
   return `https://www.google.com/maps/embed/v1/streetview?key=${googleKey}&location=${lat},${lng}&fov=90`;
+}
+
+// Find the nearest Mapillary street-level image to a point (its id is what the
+// viewer navigates to). Returns null if there's no coverage there.
+export async function nearestMapillaryImage(lat: number, lng: number): Promise<string | null> {
+  if (!mapillaryToken) return null;
+  const d = 0.0012; // ~120m search box
+  const bbox = `${lng - d},${lat - d},${lng + d},${lat + d}`;
+  try {
+    const res = await fetch(
+      `https://graph.mapillary.com/images?access_token=${mapillaryToken}&fields=id&bbox=${bbox}&limit=1`,
+    );
+    if (!res.ok) return null;
+    const json = (await res.json()) as { data?: { id: string }[] };
+    return json.data?.[0]?.id ?? null;
+  } catch {
+    return null;
+  }
 }
