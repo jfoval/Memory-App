@@ -126,8 +126,10 @@ export function RouteMap() {
   };
 
   return (
-    <div className="absolute inset-0">
-      <div ref={container} className="palace-canvas absolute inset-0" />
+    <div className="relative h-full w-full">
+      {/* Explicit h-full: MapLibre forces position:relative on this element, which
+          would cancel `absolute inset-0` and collapse it to zero height. */}
+      <div ref={container} className="palace-canvas h-full w-full" />
 
       {/* Search + locate (only useful while editing). */}
       {mode === 'edit' && (
