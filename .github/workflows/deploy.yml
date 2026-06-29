@@ -34,6 +34,10 @@ jobs:
         env:
           # Serve under https://<user>.github.io/Memory-App/
           BASE_PATH: /Memory-App/
+          # Optional: set these as repo secrets to enable Street View.
+          # Mapillary = free; Google = paid at scale (see README/cost notes).
+          VITE_MAPILLARY_TOKEN: ${{ secrets.MAPILLARY_TOKEN }}
+          VITE_GOOGLE_MAPS_KEY: ${{ secrets.GOOGLE_MAPS_KEY }}
         run: npm run build
       - uses: actions/configure-pages@v5
         with:
