@@ -1,12 +1,11 @@
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { PalaceScene } from './PalaceScene';
-import { TouchControls } from './TouchControls';
+import { PanoramaViewer } from './PanoramaViewer';
 import { NavHud } from './NavHud';
 
-// Wraps the R3F canvas with the mobile performance budget: pixel ratio clamped
-// to 2, frustum culling on by default, shadows kept cheap, and the render loop
-// paused whenever the tab/canvas is hidden.
+// Renders the photo-sphere palace. The render loop pauses when the tab/canvas is
+// hidden; the camera sits at the centre and only rotates (no movement), so there
+// is nothing to clip through and you can never get stuck.
 export function PalaceCanvas() {
   const [active, setActive] = useState(true);
 
@@ -19,16 +18,16 @@ export function PalaceCanvas() {
   return (
     <div className="palace-canvas absolute inset-0">
       <Canvas
-        shadows
         dpr={[1, 2]}
         frameloop={active ? 'always' : 'never'}
-        camera={{ fov: 70, near: 0.1, far: 200 }}
+        camera={{ fov: 75, near: 0.1, far: 1100, position: [0, 0, 0] }}
         gl={{ powerPreference: 'high-performance', antialias: true }}
       >
-        <PalaceScene />
+        <Suspense fallback={null}>
+          <PanoramaViewer />
+        </Suspense>
       </Canvas>
       <NavHud />
-      <TouchControls />
     </div>
   );
 }

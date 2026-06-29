@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { enableEmbeddings, isEmbeddingEnabled } from '../../embeddings/embeddingService';
-import { ZONES, ZONE_IDS } from '../../palace/zones';
+import { ROOMS } from '../../palace/rooms';
 import { useNav } from '../../store/navStore';
 
 const STEPS = [
@@ -48,16 +48,13 @@ export function LearnScreen() {
         </p>
 
         <div className="card">
-          <h3 className="mb-2 font-semibold">The four zones</h3>
+          <h3 className="mb-2 font-semibold">The eight rooms</h3>
           <div className="grid grid-cols-2 gap-2 text-sm">
-            {ZONE_IDS.map((id) => (
-              <div key={id} className="flex items-center gap-2">
-                <span className="h-3 w-3 rounded-full" style={{ backgroundColor: ZONES[id].tint }} />
+            {ROOMS.map((r) => (
+              <div key={r.id} className="flex items-center gap-2">
+                <span className="h-3 w-3 rounded-full" style={{ backgroundColor: r.accent }} />
                 <span>
-                  <strong>
-                    {ZONES[id].suit} {ZONES[id].name}
-                  </strong>{' '}
-                  — {ZONES[id].theme}
+                  <strong>{r.name}</strong> — {r.theme}
                 </span>
               </div>
             ))}

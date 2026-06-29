@@ -1,60 +1,50 @@
 import { create } from 'zustand';
+import { getLocus } from '../palace/palaceData';
+import { ROOMS } from '../palace/rooms';
 
-export type ControlMode = 'guided' | 'free';
-
-// Live input from the on-screen touch controls (joystick + look drag). Desktop
-// uses keyboard/pointer-lock directly in the Player component.
-export interface TouchInput {
-  moveX: number; // -1..1 strafe
-  moveY: number; // -1..1 forward/back
-  lookDX: number; // consumed look delta (yaw)
-  lookDY: number; // consumed look delta (pitch)
-}
-
+// Navigation state for the panorama palace. You look around a room (handled in
+// the viewer) and move between loci 1..52 via the guided walk, which faces each
+// locus and teleports between rooms as needed.
 interface NavState {
-  controlMode: ControlMode;
   labelsVisible: boolean;
   reducedMotion: boolean;
 
-  selectedIndex: number | null; // locus the user tapped to read/edit
-  guidedTarget: number | null; // locus to glide the camera to
-  arrivedIndex: number; // last guided destination reached (1..52)
+  currentRoom: number; // room currently displayed
+  selectedIndex: number | null; // locus tapped to read/edit
+  guidedTarget: number | null; // locus to face
+  arrivedIndex: number; // last locus reached (1..52)
 
-  touch: TouchInput;
-
-  setControlMode: (m: ControlMode) => void;
   toggleLabels: () => void;
   setReducedMotion: (v: boolean) => void;
   select: (index: number | null) => void;
   gotoLocus: (index: number) => void;
+  gotoRoom: (roomId: number) => void;
   next: () => void;
   prev: () => void;
-  clearGuidedTarget: (arrivedAt: number) => void;
-
-  setMove: (x: number, y: number) => void;
-  addLook: (dx: number, dy: number) => void;
-  consumeLook: () => { dx: number; dy: number };
+  arrive: (index: number) => void;
 }
 
 export const useNav = create<NavState>((set, get) => ({
-  controlMode: 'guided',
   labelsVisible: true,
   reducedMotion:
     typeof window !== 'undefined' &&
     window.matchMedia?.('(prefers-reduced-motion: reduce)').matches,
 
+  currentRoom: 0,
   selectedIndex: null,
   guidedTarget: 1,
   arrivedIndex: 1,
 
-  touch: { moveX: 0, moveY: 0, lookDX: 0, lookDY: 0 },
-
-  setControlMode: (controlMode) => set({ controlMode }),
   toggleLabels: () => set((s) => ({ labelsVisible: !s.labelsVisible })),
   setReducedMotion: (reducedMotion) => set({ reducedMotion }),
   select: (selectedIndex) => set({ selectedIndex }),
 
   gotoLocus: (index) => set({ guidedTarget: index, selectedIndex: index }),
+  gotoRoom: (roomId) => {
+    // Face the first locus of that room.
+    const first = getLocus(ROOMS.slice(0, roomId).reduce((n, r) => n + r.count, 0) + 1);
+    if (first) set({ guidedTarget: first.index, selectedIndex: first.index });
+  },
   next: () => {
     const i = Math.min(52, get().arrivedIndex + 1);
     set({ guidedTarget: i, selectedIndex: i });
@@ -63,15 +53,8 @@ export const useNav = create<NavState>((set, get) => ({
     const i = Math.max(1, get().arrivedIndex - 1);
     set({ guidedTarget: i, selectedIndex: i });
   },
-  clearGuidedTarget: (arrivedAt) => set({ guidedTarget: null, arrivedIndex: arrivedAt }),
-
-  setMove: (moveX, moveY) =>
-    set((s) => ({ touch: { ...s.touch, moveX, moveY } })),
-  addLook: (dx, dy) =>
-    set((s) => ({ touch: { ...s.touch, lookDX: s.touch.lookDX + dx, lookDY: s.touch.lookDY + dy } })),
-  consumeLook: () => {
-    const { lookDX, lookDY } = get().touch;
-    set((s) => ({ touch: { ...s.touch, lookDX: 0, lookDY: 0 } }));
-    return { dx: lookDX, dy: lookDY };
+  arrive: (index) => {
+    const locus = getLocus(index);
+    set({ guidedTarget: null, arrivedIndex: index, currentRoom: locus ? locus.roomId : get().currentRoom });
   },
 }));

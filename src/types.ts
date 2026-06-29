@@ -1,33 +1,15 @@
 // Shared domain types. The palace itself lives in code (src/palace); the
 // database only ever holds per-user content and progress.
 
-export type ZoneId = 1 | 2 | 3 | 4;
-
-export type LocusShape =
-  | 'cube'
-  | 'sphere'
-  | 'cylinder'
-  | 'cone'
-  | 'torus'
-  | 'pyramid'
-  | 'arch'
-  | 'ring';
-
-export interface Vec3 {
-  x: number;
-  y: number;
-  z: number;
-}
-
+// A locus is a marked direction (a "hotspot") inside one panoramic room. You
+// look around the real place and each locus is a spot you anchor a memory to.
 export interface Locus {
   index: number; // 1..52, the walking order
-  zone: ZoneId;
-  name: string; // short, memorable
-  landmark: string; // distinctive description driving the visual
-  shape: LocusShape; // fallback primitive if the model fails to load
-  color: string; // hex, distinct from immediate neighbours (fallback)
-  model: string; // GLB model slug in /public/models/<model>.glb
-  position: Vec3; // authored for clear spacing along the route
+  roomId: number; // which panorama this locus lives in
+  name: string; // short, memorable (e.g. "Courtyard 1")
+  landmark: string; // the room's vibe, shown as a hint
+  yaw: number; // horizontal direction within the room (radians)
+  pitch: number; // vertical direction within the room (radians)
 }
 
 export type ContentSetKind = 'study' | 'list' | 'verbatim' | 'numbers' | 'custom';

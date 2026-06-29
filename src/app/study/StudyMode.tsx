@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useItems } from '../../data/hooks';
 import { getLocus } from '../../palace/palaceData';
-import { ZONES } from '../../palace/zones';
+import { roomById } from '../../palace/rooms';
 
 interface Props {
   setId: string;
@@ -60,9 +60,9 @@ export function StudyMode({ setId, onExit }: Props) {
         <div className="flex flex-1 flex-col items-center justify-center text-center">
           <div
             className="mb-2 rounded-full px-3 py-1 text-xs font-medium text-white"
-            style={{ backgroundColor: ZONES[locus.zone].tint }}
+            style={{ backgroundColor: roomById(locus.roomId).accent }}
           >
-            Zone {locus.zone} · {ZONES[locus.zone].name}
+            {roomById(locus.roomId).name}
           </div>
           <h2 className="text-2xl font-bold">
             {locus.index}. {locus.name}
