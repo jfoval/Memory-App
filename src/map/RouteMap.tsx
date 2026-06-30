@@ -15,7 +15,8 @@ export function RouteMap() {
   const [ready, setReady] = useState(false);
   const [search, setSearch] = useState('');
   const [results, setResults] = useState<{ name: string; lat: number; lon: number }[]>([]);
-  const [hint, setHint] = useState('Green = Street View coverage. Zoom in and tap a green dot to walk it.');
+  const [hint, setHint] = useState('Zoom in and tap a dot to walk it. Purple = 360°, green = flat.');
+  const [only360, setOnly360] = useState(false);
 
   const route = useRoutes((s) => s.route);
   const selectedId = useRoutes((s) => s.selectedId);
@@ -68,6 +69,22 @@ export function RouteMap() {
             'circle-radius': 4,
             'circle-stroke-color': '#ffffff',
             'circle-stroke-width': 1,
+          },
+        });
+        // Highlight true 360° panoramas in purple (these give the full
+        // look-around experience; green dots are flat/perspective photos).
+        m.addLayer({
+          id: 'mly-pano',
+          type: 'circle',
+          source: 'mly',
+          'source-layer': 'image',
+          minzoom: 14,
+          filter: ['==', ['get', 'is_pano'], true],
+          paint: {
+            'circle-color': '#a855f7',
+            'circle-radius': 6,
+            'circle-stroke-color': '#ffffff',
+            'circle-stroke-width': 1.5,
           },
         });
       }
@@ -148,6 +165,18 @@ export function RouteMap() {
     });
   }, [route, selectedId, ready]);
 
+  // Toggle showing only true 360° panoramas, so coverage is easy to judge.
+  useEffect(() => {
+    const m = map.current;
+    if (!m || !ready) return;
+    try {
+      m.setFilter('mly-image', only360 ? ['==', ['get', 'is_pano'], true] : null);
+      m.setLayoutProperty('mly-seq', 'visibility', only360 ? 'none' : 'visible');
+    } catch {
+      /* layers not ready yet */
+    }
+  }, [only360, ready]);
+
   // Fly to the current stop during a walk.
   useEffect(() => {
     const m = map.current;
@@ -214,6 +243,14 @@ export function RouteMap() {
               ))}
             </div>
           )}
+          <div className="pointer-events-auto mt-1 flex items-center justify-center gap-2">
+            <button
+              className={`rounded-full px-3 py-1 text-xs ${only360 ? 'bg-purple-600 text-white' : 'bg-black/50 text-white/90'}`}
+              onClick={() => setOnly360((v) => !v)}
+            >
+              {only360 ? '● 360° only' : '○ Show 360° only'}
+            </button>
+          </div>
           <p className="pointer-events-none mt-1 rounded bg-black/40 px-2 py-1 text-center text-xs text-white">
             {hint}
           </p>
