@@ -7,6 +7,7 @@ import {
   updatePoint,
   type Route,
   type RoutePoint,
+  type StreetViewPov,
 } from '../data/routes';
 
 // Holds the route currently being edited or walked. Every mutation persists.
@@ -23,7 +24,7 @@ interface RoutesState {
   close: () => void;
   select: (id: string | null) => void;
   addAt: (lat: number, lng: number) => void;
-  addStreetStop: (lat: number, lng: number, imageId: string) => void;
+  addStreetStop: (lat: number, lng: number, imageId: string, pov?: StreetViewPov) => void;
   update: (id: string, patch: Partial<RoutePoint>) => void;
   remove: (id: string) => void;
   move: (id: string, dir: -1 | 1) => void;
@@ -61,10 +62,10 @@ export const useRoutes = create<RoutesState>((set, get) => ({
     const next = persist(addPoint(r, lat, lng));
     set({ route: next, selectedId: next.points[next.points.length - 1].id });
   },
-  addStreetStop: (lat, lng, imageId) => {
+  addStreetStop: (lat, lng, imageId, pov) => {
     const r = get().route;
     if (!r) return;
-    const next = persist(addPoint(r, lat, lng, imageId));
+    const next = persist(addPoint(r, lat, lng, imageId, pov));
     set({ route: next, selectedId: next.points[next.points.length - 1].id });
   },
   update: (id, patch) => {

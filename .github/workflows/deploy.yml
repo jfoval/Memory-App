@@ -34,7 +34,10 @@ jobs:
         env:
           # Serve under https://<user>.github.io/Memory-App/
           BASE_PATH: /Memory-App/
-          # Street-view keys are read from .env.production (public client tokens).
+          # The Mapillary token is a public client token in .env.production.
+          # The Google Maps key is injected from a repo secret (kept out of git);
+          # it's still referrer-restricted, which is what actually protects it.
+          VITE_GOOGLE_MAPS_KEY: ${{ secrets.VITE_GOOGLE_MAPS_KEY }}
         run: npm run build
       - uses: actions/configure-pages@v5
         with:

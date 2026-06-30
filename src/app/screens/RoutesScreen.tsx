@@ -4,12 +4,18 @@ import { useRoutes } from '../../store/routesStore';
 import { createRoute, deleteRoute, listRoutes, type Route } from '../../data/routes';
 import { PointPanel } from '../../map/PointPanel';
 import { WalkPanel } from '../../map/WalkPanel';
+import { streetViewProvider } from '../../map/streetview';
 
 // Heavy map/street libraries load only when a route is opened.
 const RouteMap = lazy(() => import('../../map/RouteMap').then((m) => ({ default: m.RouteMap })));
 const MapillaryWalk = lazy(() =>
   import('../../map/MapillaryWalk').then((m) => ({ default: m.MapillaryWalk })),
 );
+const GoogleWalk = lazy(() => import('../../map/GoogleWalk').then((m) => ({ default: m.GoogleWalk })));
+
+// Google (universal 360°) is preferred when its key is set; Mapillary is the
+// free fallback.
+const StreetWalk = streetViewProvider === 'google' ? GoogleWalk : MapillaryWalk;
 
 export function RoutesScreen() {
   const uid = useAuth((s) => s.user?.id);
@@ -81,7 +87,7 @@ export function RoutesScreen() {
               <div className="flex h-full items-center justify-center text-slate-400">Loading…</div>
             }
           >
-            {view === 'map' ? <RouteMap /> : <MapillaryWalk />}
+            {view === 'map' ? <RouteMap /> : <StreetWalk />}
           </Suspense>
           {/* Edit content in a panel; map-walk uses WalkPanel; street-walk has its own overlay. */}
           {mode === 'edit' && <PointPanel />}

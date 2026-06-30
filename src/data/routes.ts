@@ -5,12 +5,20 @@ import { nowIso, uuid } from '../lib/ids';
 // remember. Stored per-user in localStorage (cloud sync can layer on later via
 // the existing repository pattern).
 
+// Where to look from the viewing panorama to see this locus (Google Street View).
+export interface StreetViewPov {
+  heading: number; // compass bearing, degrees
+  pitch: number; // vertical tilt, degrees
+  zoom: number; // magnification
+}
+
 export interface RoutePoint {
   id: string;
   order: number; // 1-based position along the walk
   lat: number;
   lng: number;
-  imageId?: string; // street-level image this stop was dropped at (Mapillary)
+  imageId?: string; // street-level pano/image this stop was viewed from (Mapillary id or Google panoId)
+  pov?: StreetViewPov; // gaze direction toward the locus, so a walk returns facing it
   label: string; // the place ("the oak tree", "Joe's Diner")
   content: string; // what to remember here
   association: string; // the user's vivid link (optional)
@@ -81,13 +89,20 @@ export function renumber(points: RoutePoint[]): RoutePoint[] {
   return points.map((p, i) => ({ ...p, order: i + 1 }));
 }
 
-export function addPoint(route: Route, lat: number, lng: number, imageId?: string): Route {
+export function addPoint(
+  route: Route,
+  lat: number,
+  lng: number,
+  imageId?: string,
+  pov?: StreetViewPov,
+): Route {
   const point: RoutePoint = {
     id: uuid(),
     order: route.points.length + 1,
     lat,
     lng,
     imageId,
+    pov,
     label: `Stop ${route.points.length + 1}`,
     content: '',
     association: '',

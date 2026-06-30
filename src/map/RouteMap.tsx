@@ -2,8 +2,13 @@ import { useEffect, useRef, useState } from 'react';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { OPENFREEMAP_STYLE } from './mapStyle';
-import { mapillaryCoverageTiles } from './streetview';
+import { mapillaryCoverageTiles, streetViewProvider } from './streetview';
+import { nearestGooglePano } from './googleLoader';
 import { useRoutes } from '../store/routesStore';
+
+// With Google (universal 360°) we skip the Mapillary coverage overlay and just
+// resolve the nearest panorama wherever you tap.
+const googleMode = streetViewProvider === 'google';
 
 // The map is the "find your start" step. Mapillary coverage is painted on it in
 // green, and tapping a green point drops you into that exact panorama — no flaky
@@ -15,7 +20,11 @@ export function RouteMap() {
   const [ready, setReady] = useState(false);
   const [search, setSearch] = useState('');
   const [results, setResults] = useState<{ name: string; lat: number; lon: number }[]>([]);
-  const [hint, setHint] = useState('Zoom in and tap a dot to walk it. Purple = 360°, green = flat.');
+  const [hint, setHint] = useState(
+    googleMode
+      ? 'Search a place, then tap the map where you want to start walking.'
+      : 'Zoom in and tap a dot to walk it. Purple = 360°, green = flat.',
+  );
   const [only360, setOnly360] = useState(false);
 
   const route = useRoutes((s) => s.route);
@@ -48,7 +57,8 @@ export function RouteMap() {
         });
       }
       // Mapillary coverage overlay (green) so it's obvious what you can pick.
-      const cov = mapillaryCoverageTiles();
+      // Skipped entirely in Google mode (coverage is ~everywhere).
+      const cov = googleMode ? null : mapillaryCoverageTiles();
       if (cov && !m.getSource('mly')) {
         m.addSource('mly', { type: 'vector', tiles: [cov], minzoom: 6, maxzoom: 14 });
         m.addLayer({
@@ -97,8 +107,20 @@ export function RouteMap() {
     m.on('styledata', ensureLayers);
     setTimeout(() => m.resize(), 250);
 
+    // Google mode: tap anywhere; resolve the nearest panorama and drop in.
+    const enterGoogleAt = async (lat: number, lng: number) => {
+      setHint('Finding Street View…');
+      const n = (await nearestGooglePano(lat, lng, 50)) ?? (await nearestGooglePano(lat, lng, 400));
+      if (n) useRoutes.getState().setEntry({ lat: n.lat, lng: n.lng, imageId: n.panoId });
+      else setHint('No Street View coverage right there — try a nearby road.');
+    };
+
     // Tap a green coverage point -> enter Street View at that exact image.
     m.on('click', (e) => {
+      if (googleMode) {
+        void enterGoogleAt(e.lngLat.lat, e.lngLat.lng);
+        return;
+      }
       const box: [maplibregl.PointLike, maplibregl.PointLike] = [
         [e.point.x - 10, e.point.y - 10],
         [e.point.x + 10, e.point.y + 10],
@@ -168,7 +190,7 @@ export function RouteMap() {
   // Toggle showing only true 360° panoramas, so coverage is easy to judge.
   useEffect(() => {
     const m = map.current;
-    if (!m || !ready) return;
+    if (!m || !ready || googleMode) return;
     try {
       m.setFilter('mly-image', only360 ? ['==', ['get', 'is_pano'], true] : null);
       m.setLayoutProperty('mly-seq', 'visibility', only360 ? 'none' : 'visible');
@@ -243,14 +265,16 @@ export function RouteMap() {
               ))}
             </div>
           )}
-          <div className="pointer-events-auto mt-1 flex items-center justify-center gap-2">
-            <button
-              className={`rounded-full px-3 py-1 text-xs ${only360 ? 'bg-purple-600 text-white' : 'bg-black/50 text-white/90'}`}
-              onClick={() => setOnly360((v) => !v)}
-            >
-              {only360 ? '● 360° only' : '○ Show 360° only'}
-            </button>
-          </div>
+          {!googleMode && (
+            <div className="pointer-events-auto mt-1 flex items-center justify-center gap-2">
+              <button
+                className={`rounded-full px-3 py-1 text-xs ${only360 ? 'bg-purple-600 text-white' : 'bg-black/50 text-white/90'}`}
+                onClick={() => setOnly360((v) => !v)}
+              >
+                {only360 ? '● 360° only' : '○ Show 360° only'}
+              </button>
+            </div>
+          )}
           <p className="pointer-events-none mt-1 rounded bg-black/40 px-2 py-1 text-center text-xs text-white">
             {hint}
           </p>

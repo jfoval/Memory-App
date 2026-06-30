@@ -12,6 +12,15 @@ export const hasMapillary = !!mapillaryToken;
 export const hasGoogleStreetView = !!googleKey;
 export const getMapillaryToken = () => mapillaryToken;
 
+// Which interactive walker to use. Google (universal 360°) wins when its key is
+// set; Mapillary is the free fallback.
+export type StreetViewProvider = 'google' | 'mapillary' | 'none';
+export const streetViewProvider: StreetViewProvider = hasGoogleStreetView
+  ? 'google'
+  : hasMapillary
+    ? 'mapillary'
+    : 'none';
+
 // Mapillary coverage vector tiles — paint these on the map so the user can see
 // exactly which streets have imagery (and tap one to jump in).
 export function mapillaryCoverageTiles(): string | null {
