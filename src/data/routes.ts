@@ -1,4 +1,5 @@
 import { nowIso, uuid } from '../lib/ids';
+import { makeSeed, shuffledDeck } from '../logic/cards';
 
 // A "palace" is now a user-defined route on a real map: an ordered list of pins
 // (loci) the user drops along a path they know. Each pin holds the thing to
@@ -22,6 +23,14 @@ export interface RoutePoint {
   label: string; // the place ("the oak tree", "Joe's Diner")
   content: string; // what to remember here
   association: string; // the user's vivid link (optional)
+  card?: number; // playing-card id 0..51 in Practice mode (see logic/cards.ts)
+}
+
+// One Test-mode result, kept so the user can see progress over time.
+export interface ScoreEntry {
+  date: string;
+  streak: number; // how many in a row before the first miss
+  total: number; // number of stops in the route at the time
 }
 
 export interface Route {
@@ -31,6 +40,8 @@ export interface Route {
   createdAt: string;
   updatedAt: string;
   points: RoutePoint[];
+  bestStreak?: number; // best Test-mode run on this route
+  scoreHistory?: ScoreEntry[]; // recent Test results, newest last
 }
 
 const KEY = 'mp:routes:v1';
@@ -125,4 +136,22 @@ export function movePoint(route: Route, id: string, dir: -1 | 1): Route {
   const points = [...route.points];
   [points[i], points[j]] = [points[j], points[i]];
   return { ...route, points: renumber(points) };
+}
+
+// --- Practice (card) mode ---
+
+// Deal one distinct random playing card to each stop (Practice mode).
+export function dealCards(route: Route): Route {
+  const deck = shuffledDeck(makeSeed(), route.points.length);
+  return { ...route, points: route.points.map((p, i) => ({ ...p, card: deck[i] })) };
+}
+
+// Record a Test-mode run, updating the all-time best streak and recent history.
+export function recordScore(route: Route, streak: number, total: number): Route {
+  const entry: ScoreEntry = { date: nowIso(), streak, total };
+  return {
+    ...route,
+    bestStreak: Math.max(route.bestStreak ?? 0, streak),
+    scoreHistory: [...(route.scoreHistory ?? []), entry].slice(-20),
+  };
 }

@@ -4,6 +4,7 @@ import 'mapillary-js/dist/mapillary.css';
 import { useRoutes } from '../store/routesStore';
 import { getMapillaryToken, hasMapillary, nearestMapillaryImage } from './streetview';
 import { WalkOverlay } from './WalkOverlay';
+import { TestOverlay } from './TestOverlay';
 
 type Status = 'loading' | 'ready' | 'none' | 'notoken';
 
@@ -81,9 +82,9 @@ export function MapillaryWalk() {
   };
   useEffect(drawMarkers, [route.points, status]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Guided walk: fly to each stop's image.
+  // Guided walk / test: fly to each stop's image.
   useEffect(() => {
-    if (mode !== 'walk' || status !== 'ready') return;
+    if (mode === 'edit' || status !== 'ready') return;
     const v = viewer.current;
     const stop = route.points[walkIndex];
     if (!v || !stop) return;
@@ -134,6 +135,9 @@ export function MapillaryWalk() {
 
       {/* Walk: show the stop's content with reveal/hide. */}
       {status === 'ready' && mode === 'walk' && <WalkOverlay revealed={revealed} />}
+
+      {/* Test: name the card at each stop. */}
+      {status === 'ready' && mode === 'test' && <TestOverlay />}
     </div>
   );
 }

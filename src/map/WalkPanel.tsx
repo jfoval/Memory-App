@@ -1,4 +1,5 @@
 import { useRoutes } from '../store/routesStore';
+import { CardBadge } from './CardBadge';
 
 // During a map walk, the map flies stop-to-stop. This panel shows the current
 // stop's content (hide/reveal for self-testing) and a button to walk this spot
@@ -36,12 +37,19 @@ export function WalkPanel() {
 
         <div className="min-h-[60px] rounded-lg bg-slate-100 p-3 text-sm dark:bg-slate-800">
           {revealed ? (
-            <>
-              <p>{point.content || <span className="text-slate-400">No content placed here.</span>}</p>
-              {point.association && (
-                <p className="mt-1 text-xs italic text-slate-500">💭 {point.association}</p>
-              )}
-            </>
+            <div className="flex items-start gap-3">
+              {point.card != null && <CardBadge cardId={point.card} size="md" />}
+              <div className="min-w-0 flex-1">
+                {point.content ? (
+                  <p>{point.content}</p>
+                ) : point.card == null ? (
+                  <span className="text-slate-400">No content placed here.</span>
+                ) : null}
+                {point.association && (
+                  <p className="mt-1 text-xs italic text-slate-500">💭 {point.association}</p>
+                )}
+              </div>
+            </div>
           ) : (
             <button className="btn-primary w-full" onClick={() => setRevealed(true)}>
               Reveal

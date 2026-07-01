@@ -1,7 +1,9 @@
 import { create } from 'zustand';
 import {
   addPoint,
+  dealCards as dealCardsToRoute,
   movePoint,
+  recordScore,
   removePoint,
   saveRoute,
   updatePoint,
@@ -10,17 +12,19 @@ import {
   type StreetViewPov,
 } from '../data/routes';
 
+export type RouteMode = 'edit' | 'walk' | 'test';
+
 // Holds the route currently being edited or walked. Every mutation persists.
 interface RoutesState {
   route: Route | null;
   selectedId: string | null;
-  mode: 'edit' | 'walk';
+  mode: RouteMode;
   view: 'map' | 'street';
   entry: { lat: number; lng: number; imageId?: string } | null; // where to enter Street View
   walkIndex: number; // index into points during a walk
   revealed: boolean;
 
-  open: (route: Route, mode?: 'edit' | 'walk') => void;
+  open: (route: Route, mode?: RouteMode) => void;
   close: () => void;
   select: (id: string | null) => void;
   addAt: (lat: number, lng: number) => void;
@@ -29,8 +33,10 @@ interface RoutesState {
   remove: (id: string) => void;
   move: (id: string, dir: -1 | 1) => void;
   rename: (name: string) => void;
+  dealCards: () => void;
+  recordTestScore: (streak: number, total: number) => void;
 
-  setMode: (mode: 'edit' | 'walk') => void;
+  setMode: (mode: RouteMode) => void;
   setView: (view: 'map' | 'street') => void;
   setEntry: (entry: { lat: number; lng: number; imageId?: string }) => void;
   walkTo: (index: number) => void;
@@ -88,8 +94,18 @@ export const useRoutes = create<RoutesState>((set, get) => ({
     if (!r) return;
     set({ route: persist({ ...r, name }) });
   },
+  dealCards: () => {
+    const r = get().route;
+    if (!r) return;
+    set({ route: persist(dealCardsToRoute(r)) });
+  },
+  recordTestScore: (streak, total) => {
+    const r = get().route;
+    if (!r) return;
+    set({ route: persist(recordScore(r, streak, total)) });
+  },
 
-  setMode: (mode) => set({ mode, revealed: mode === 'edit' }),
+  setMode: (mode) => set({ mode, revealed: mode === 'edit', walkIndex: 0 }),
   setView: (view) => set({ view }),
   setEntry: (entry) => set({ entry, view: 'street' }),
   walkTo: (walkIndex) => set({ walkIndex, revealed: false }),

@@ -1,4 +1,5 @@
 import { useRoutes } from '../store/routesStore';
+import { CardBadge } from './CardBadge';
 
 // Bottom sheet to edit the selected pin: the place name, what to remember there,
 // a vivid association, plus a free "Street View" link and reorder/delete.
@@ -40,6 +41,14 @@ export function PointPanel() {
           </div>
         </div>
 
+        {point.card != null && (
+          <div className="flex items-center gap-2 rounded-lg bg-slate-100 p-2 dark:bg-slate-800">
+            <CardBadge cardId={point.card} size="sm" />
+            <span className="text-xs text-slate-500">
+              Memorize this card here — weave it into your vivid image below.
+            </span>
+          </div>
+        )}
         <input
           className="input text-sm"
           placeholder="The place (e.g. the oak tree, Joe's Diner)"

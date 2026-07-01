@@ -1,11 +1,11 @@
 import { useUi, type Tab } from '../store/uiStore';
 import { useAuth } from '../auth/authStore';
 import { RoutesScreen } from './screens/RoutesScreen';
-import { LearnScreen } from './screens/LearnScreen';
+import { InstructionsScreen } from './screens/InstructionsScreen';
 
 const TABS: { id: Tab; label: string; icon: string }[] = [
+  { id: 'instructions', label: 'Instructions', icon: '📖' },
   { id: 'routes', label: 'Routes', icon: '🗺️' },
-  { id: 'learn', label: 'Learn', icon: '💡' },
 ];
 
 export function AppShell() {
@@ -34,7 +34,7 @@ export function AppShell() {
 
       <main className="relative flex-1 overflow-hidden">
         {tab === 'routes' && <RoutesScreen />}
-        {tab === 'learn' && <LearnScreen />}
+        {tab === 'instructions' && <InstructionsScreen />}
       </main>
 
       <nav

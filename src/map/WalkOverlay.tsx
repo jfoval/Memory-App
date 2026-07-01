@@ -1,4 +1,5 @@
 import { useRoutes } from '../store/routesStore';
+import { CardBadge } from './CardBadge';
 
 // The walk-mode card shown over a street viewer: the current stop's content with
 // reveal/hide and prev/next. Shared by both the Mapillary and Google walkers.
@@ -22,12 +23,19 @@ export function WalkOverlay({ revealed }: { revealed: boolean }) {
         </div>
         <div className="min-h-[52px] rounded-lg bg-slate-100 p-3 text-sm dark:bg-slate-800">
           {revealed ? (
-            <>
-              <p>{stop.content || <span className="text-slate-400">Nothing placed here.</span>}</p>
-              {stop.association && (
-                <p className="mt-1 text-xs italic text-slate-500">💭 {stop.association}</p>
-              )}
-            </>
+            <div className="flex items-start gap-3">
+              {stop.card != null && <CardBadge cardId={stop.card} size="md" />}
+              <div className="min-w-0 flex-1">
+                {stop.content ? (
+                  <p>{stop.content}</p>
+                ) : stop.card == null ? (
+                  <span className="text-slate-400">Nothing placed here.</span>
+                ) : null}
+                {stop.association && (
+                  <p className="mt-1 text-xs italic text-slate-500">💭 {stop.association}</p>
+                )}
+              </div>
+            </div>
           ) : (
             <button className="btn-primary w-full" onClick={() => setRevealed(true)}>
               Reveal

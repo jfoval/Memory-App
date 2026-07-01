@@ -4,6 +4,7 @@ import { hasGoogleStreetView } from './streetview';
 import { loadGoogleMaps, nearestGooglePano } from './googleLoader';
 import { screenToGround } from './googleProjection';
 import { WalkOverlay } from './WalkOverlay';
+import { TestOverlay } from './TestOverlay';
 import type { RoutePoint, StreetViewPov } from '../data/routes';
 
 type Status = 'loading' | 'ready' | 'none' | 'nokey';
@@ -125,9 +126,9 @@ export function GoogleWalk() {
   };
   useEffect(drawMarkers, [route.points, status, selectedId]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Guided walk: fly to each stop's pano, facing the locus.
+  // Guided walk / test: fly to each stop's pano, facing the locus.
   useEffect(() => {
-    if (mode !== 'walk' || status !== 'ready') return;
+    if (mode === 'edit' || status !== 'ready') return;
     const stop = route.points[walkIndex];
     if (stop) void gotoStop(stop);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -180,7 +181,7 @@ export function GoogleWalk() {
       <div ref={container} className="palace-canvas h-full w-full bg-slate-900" />
 
       {/* Tap-to-place overlay (intercepts the click so it doesn't move you). */}
-      {placing && status === 'ready' && (
+      {placing && status === 'ready' && mode === 'edit' && (
         <div className="absolute inset-0 z-30 cursor-crosshair" onClick={placeAt}>
           <div className="pointer-events-none absolute inset-x-0 top-4 flex justify-center">
             <span className="rounded-full border border-blue-400 bg-slate-900/80 px-4 py-2 text-sm font-medium text-blue-200">
@@ -222,6 +223,9 @@ export function GoogleWalk() {
 
       {/* Walk: show the stop's content with reveal/hide. */}
       {status === 'ready' && mode === 'walk' && <WalkOverlay revealed={revealed} />}
+
+      {/* Test: name the card at each stop. */}
+      {status === 'ready' && mode === 'test' && <TestOverlay />}
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { useRoutes } from '../../store/routesStore';
 import { createRoute, deleteRoute, listRoutes, type Route } from '../../data/routes';
 import { PointPanel } from '../../map/PointPanel';
 import { WalkPanel } from '../../map/WalkPanel';
+import { TestOverlay } from '../../map/TestOverlay';
 import { streetViewProvider } from '../../map/streetview';
 
 // Heavy map/street libraries load only when a route is opened.
@@ -19,7 +20,7 @@ const StreetWalk = streetViewProvider === 'google' ? GoogleWalk : MapillaryWalk;
 
 export function RoutesScreen() {
   const uid = useAuth((s) => s.user?.id);
-  const { route, mode, view, open, close, setMode, setView, rename } = useRoutes();
+  const { route, mode, view, open, close, setMode, setView, rename, dealCards } = useRoutes();
   const [routes, setRoutesList] = useState<Route[]>([]);
   const [name, setName] = useState('');
 
@@ -29,8 +30,16 @@ export function RoutesScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [uid, route]);
 
-  // --- Active route: map editor / walk ---
+  // --- Active route: map editor / walk / test ---
   if (route) {
+    const dealNow = () => {
+      if (route.points.length === 0) return;
+      const already = route.points.some((p) => p.card != null);
+      if (already && !confirm('Re-deal new random cards to every stop? This replaces the current cards.'))
+        return;
+      dealCards();
+      setMode('edit');
+    };
     return (
       <div className="flex h-full w-full flex-col">
         {/* Header row (its own band, so nothing overlaps the map). */}
@@ -49,6 +58,16 @@ export function RoutesScreen() {
             value={route.name}
             onChange={(e) => rename(e.target.value)}
           />
+          {mode === 'edit' && (
+            <button
+              className="btn-ghost shrink-0 px-2 py-1 text-xs"
+              onClick={dealNow}
+              disabled={route.points.length === 0}
+              title="Deal a random playing card to each stop (Practice mode)"
+            >
+              🃏 Deal
+            </button>
+          )}
           <div className="flex shrink-0 overflow-hidden rounded-lg border border-slate-300 text-xs dark:border-slate-700">
             <button
               className={`px-2.5 py-1.5 ${view === 'map' ? 'bg-slate-700 text-white' : 'bg-transparent'}`}
@@ -77,6 +96,13 @@ export function RoutesScreen() {
             >
               Walk
             </button>
+            <button
+              className={`px-2.5 py-1.5 ${mode === 'test' ? 'bg-blue-600 text-white' : 'bg-transparent'}`}
+              onClick={() => setMode('test')}
+              disabled={route.points.length === 0}
+            >
+              Test
+            </button>
           </div>
         </div>
 
@@ -89,9 +115,10 @@ export function RoutesScreen() {
           >
             {view === 'map' ? <RouteMap /> : <StreetWalk />}
           </Suspense>
-          {/* Edit content in a panel; map-walk uses WalkPanel; street-walk has its own overlay. */}
+          {/* Edit content in a panel; map walk/test use their overlays; street has its own. */}
           {mode === 'edit' && <PointPanel />}
           {mode === 'walk' && view === 'map' && <WalkPanel />}
+          {mode === 'test' && view === 'map' && <TestOverlay />}
         </div>
       </div>
     );

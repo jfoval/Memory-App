@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-export type Tab = 'routes' | 'learn';
+export type Tab = 'routes' | 'instructions';
 
 interface UiState {
   tab: Tab;
@@ -8,6 +8,6 @@ interface UiState {
 }
 
 export const useUi = create<UiState>((set) => ({
-  tab: 'routes',
+  tab: 'instructions', // the instructions page greets you on every load
   setTab: (tab) => set({ tab }),
 }));
