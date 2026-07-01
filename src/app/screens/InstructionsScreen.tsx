@@ -1,6 +1,41 @@
 import { useEffect, useState } from 'react';
 import { useUi } from '../../store/uiStore';
 
+const PLACE_IDEAS = [
+  {
+    title: 'Your childhood neighborhood',
+    why: "You still know every house on your street and a few blocks out — dozens of ready-made stops.",
+  },
+  {
+    title: 'Your commute to work or school',
+    why: 'You pass the same landmarks in the same order every single day.',
+  },
+  {
+    title: "The drive to a friend's or relative's house",
+    why: 'A familiar route with memorable turns, signs, and buildings along the way.',
+  },
+  {
+    title: 'Downtown in a favorite city',
+    why: "A strip you've walked many times — each storefront makes a distinct, vivid stop.",
+  },
+  {
+    title: 'Your own home, room to room',
+    why: 'The classic. Always available, and perfect for your very first route.',
+  },
+  {
+    title: 'A school or campus you attended',
+    why: 'Front gate → hallways → your old classroom or dorm. Deeply burned in.',
+  },
+  {
+    title: 'A store you shop at often',
+    why: 'Walk the aisles in their real order — a grocery or hardware store you know cold.',
+  },
+  {
+    title: 'A regular walk, run, or park loop',
+    why: 'A path your body already knows by heart, with natural markers along it.',
+  },
+];
+
 // The first screen on load: how the method works, the two game modes, how to fill
 // each box, best practices, and the learning drill.
 export function InstructionsScreen() {
@@ -38,6 +73,29 @@ export function InstructionsScreen() {
             <li>At each stop, place one thing to remember plus a weird image that ties it there.</li>
             <li>Walk the route in your mind, in order, to recall everything.</li>
           </ol>
+        </div>
+
+        <div className="card space-y-3 border-blue-500/40">
+          <div>
+            <h2 className="font-semibold">📍 Not sure what place to pick?</h2>
+            <p className="text-sm text-slate-500">
+              The best palace is any <b>real place you can picture with your eyes closed</b> — one you
+              move through in a natural order. A few that work especially well:
+            </p>
+          </div>
+          <ul className="grid gap-2 text-sm sm:grid-cols-2">
+            {PLACE_IDEAS.map((p) => (
+              <li key={p.title} className="rounded-lg bg-slate-100 p-3 dark:bg-slate-800">
+                <span className="font-semibold">{p.title}</span>
+                <span className="mt-0.5 block text-xs text-slate-500">{p.why}</span>
+              </li>
+            ))}
+          </ul>
+          <p className="text-xs text-slate-500">
+            Tip: use a <b>different place for each topic</b> so your memories don't blur together —
+            you can build as many routes as you like. Start small (5–10 stops); a long, familiar route
+            can hold dozens.
+          </p>
         </div>
 
         <h2 className="pt-1 text-lg font-bold">Two ways to play</h2>
