@@ -1,38 +1,40 @@
 import { useEffect, useState } from 'react';
 import { useUi } from '../../store/uiStore';
 
+// Street View is outdoors, along roads and sidewalks — so every idea here is an
+// outdoor route you travel past building fronts, signs, and landmarks.
 const PLACE_IDEAS = [
   {
     title: 'Your childhood neighborhood',
-    why: "You still know every house on your street and a few blocks out — dozens of ready-made stops.",
+    why: 'Drive or walk the streets you grew up on — you can still name every house you pass.',
   },
   {
-    title: 'Your commute to work or school',
-    why: 'You pass the same landmarks in the same order every single day.',
+    title: 'Your daily commute',
+    why: 'The exact route you drive or ride to work or school, landmark by landmark.',
   },
   {
     title: "The drive to a friend's or relative's house",
-    why: 'A familiar route with memorable turns, signs, and buildings along the way.',
+    why: 'A familiar route with memorable turns, signs, and corner buildings along the way.',
   },
   {
     title: 'Downtown in a favorite city',
-    why: "A strip you've walked many times — each storefront makes a distinct, vivid stop.",
+    why: "A sidewalk you've walked many times — each storefront makes a distinct, vivid stop.",
   },
   {
-    title: 'Your own home, room to room',
-    why: 'The classic. Always available, and perfect for your very first route.',
+    title: 'The street you live on now',
+    why: 'Head out the front door and go past each house or building down the block, in order.',
   },
   {
-    title: 'A school or campus you attended',
-    why: 'Front gate → hallways → your old classroom or dorm. Deeply burned in.',
+    title: "A scenic drive you've done",
+    why: 'A memorable stretch of highway, coast, or country road — turnoffs and views as stops.',
   },
   {
-    title: 'A store you shop at often',
-    why: 'Walk the aisles in their real order — a grocery or hardware store you know cold.',
+    title: 'Your route to a regular spot',
+    why: 'The way to the gym, church, or coffee shop — use what you pass, not the inside.',
   },
   {
-    title: 'A regular walk, run, or park loop',
-    why: 'A path your body already knows by heart, with natural markers along it.',
+    title: 'A famous place, explored fresh',
+    why: 'No familiar route handy? Learn a new one — Times Square, an old-town center, a boardwalk.',
   },
 ];
 
@@ -66,8 +68,8 @@ export function InstructionsScreen() {
           <h2 className="font-semibold">The basic idea</h2>
           <ol className="list-decimal space-y-1 pl-5 text-sm text-slate-600 dark:text-slate-300">
             <li>
-              Pick a place you know well — your home, a commute, a street — or explore a new one in
-              Street View.
+              Pick an outdoor route you know well — your street, a commute, a neighborhood — or
+              explore a new one in Street View.
             </li>
             <li>Drop a handful of <b>stops</b> (loci) along a path through it.</li>
             <li>At each stop, place one thing to remember plus a weird image that ties it there.</li>
@@ -79,8 +81,9 @@ export function InstructionsScreen() {
           <div>
             <h2 className="font-semibold">📍 Not sure what place to pick?</h2>
             <p className="text-sm text-slate-500">
-              The best palace is any <b>real place you can picture with your eyes closed</b> — one you
-              move through in a natural order. A few that work especially well:
+              You'll be walking it in Google Street View, so pick a <b>real outdoor route</b> you can
+              picture with your eyes closed — streets and sidewalks you travel in a natural order,
+              past house fronts, storefronts, and landmarks. A few that work especially well:
             </p>
           </div>
           <ul className="grid gap-2 text-sm sm:grid-cols-2">
